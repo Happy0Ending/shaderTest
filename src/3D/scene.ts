@@ -30,7 +30,7 @@ export class SceneManager {
         let gl = new GlowLayer("gl", scene);
 
         gl.blurKernelSize = 2;
-        SceneLoader.ImportMesh('', '', "rocket.glb", scene, (meshes, an, bb, cc) => {
+        SceneLoader.ImportMesh('', '', "2222.glb", scene, (meshes, an, bb, cc) => {
             meshes.forEach((mesh) => {
                 if (mesh.name.includes("Shield")) {
                     mesh.dispose();
