@@ -30,6 +30,9 @@ export class SceneManager {
         let gl = new GlowLayer("gl", scene);
 
         gl.blurKernelSize = 2;
+        let hl = new HighlightLayer("hl",scene);
+        let a = '𝄞'; 
+        console.log(a.length);
         SceneLoader.ImportMesh('', '', "2222.glb", scene, (meshes, an, bb, cc) => {
             meshes.forEach((mesh) => {
                 if (mesh.name.includes("Shield")) {
@@ -44,10 +47,13 @@ export class SceneManager {
                 mesh.enableEdgesRendering();
                 mesh.edgesColor = Color4.FromColor3(color,1);
                 let shader = outLineAlphaByMesh(scene, mesh,color,1);
+
+                console.log(shader.getClassName());
+                
                 const mat2 = shader.mat;
                 this.matList.push(shader);
                 mesh.material = mat2;
-                // gl.referenceMeshToUseItsOwnMaterial(mesh);
+                // mesh instanceof Mesh &&hl.addMesh(mesh,Color3.FromHexString("#91f6fe"),true);
             })
         })
         scene.onNewMeshAddedObservable.add(()=>{
@@ -79,9 +85,7 @@ export class SceneManager {
         let max: Vector3 = Vector3.Zero();
 
         nodes.forEach((node) => {
-
             let minimumWorld: Vector3, maximumWorld: Vector3;
-
             const mesh = node;
             const boundingBox = mesh.getBoundingInfo().boundingBox;
             minimumWorld = boundingBox.minimumWorld;

@@ -587,15 +587,19 @@ export function outLineAlphaByMesh(scene: Scene, mesh: AbstractMesh,color:string
     mat.setColor3("changeColor", changeColor as Color3);
     mat.setVector3("center",center);
     mat.setFloat("power",alphaPow);
-    mat.setFloat("k",k)
+    mat.setFloat("k",k);
     mat.setVector3("viewPoint",viewPoint as Vector3);
     const uniforms: {name:string,uniform:any}[] = [];
     uniforms.push({name:"power",uniform:alphaPow});
     uniforms.push({name:"changeColor",uniform:changeColor});
     uniforms.push({name:"k",uniform:k});
+    const getClassName = ()=>{
+        return "Shader";
+    }
     return {
         mat,
-        uniforms
+        uniforms,
+        getClassName
     };
 }
 
