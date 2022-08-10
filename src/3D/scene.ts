@@ -1,11 +1,13 @@
-import { AbstractMesh, ArcRotateCamera, BoundingBoxGizmo, Color3, Color4, EdgesRenderer, Effect, Engine, GizmoManager, GlowLayer, HemisphericLight, HighlightLayer, LineEdgesRenderer, LinesMesh, Material, Mesh, MeshAssetTask, MeshBuilder, NodeMaterial, PBRMaterial, Scene, SceneLoader, SceneSerializer, ShaderMaterial, SpotLight, Texture, TransformNode, Vector3 } from "babylonjs";
-import { blueMat, explore, gradientMat, modelToShader, outLineAlphaByMesh, outSkinAlphaByMesh, outSkinByMeshes, UVScaleByTime } from "./shader";
+import { AbstractMesh, ArcRotateCamera, Color3, Color4, Engine, GizmoManager, GlowLayer, HemisphericLight, HighlightLayer, Matrix, MeshBuilder, Scene, SceneLoader, Texture, Vector3 } from "babylonjs";
+import { outLineAlphaByMesh } from "./shader";
 import 'babylonjs-loaders'
-import { Ishader, setUniform, setUniform2 } from "./shaderType";
+import { Ishader } from "./shaderType";
 import { setValueMeshEdge, setValueShaderMaterial } from "./setValue";
 import { IEdges, IshaderMatInfo } from "./IProperty";
 import { IOptions } from "./Ioptions";
 import { IType } from "./IType";
+import { AdvancedDynamicTexture, TextBlock } from "babylonjs-gui";
+import { createHtmlMesh } from "./GUI/CSS3DRender";
 export class SceneManager {
     public engine: Engine;
     public activeScene: Scene;
@@ -22,62 +24,59 @@ export class SceneManager {
     }
     createScene(engine: Engine, canvas: HTMLCanvasElement) {
         let scene = new Scene(engine);
-        scene.clearColor = new Color4(0, 0, 0, 1)
+        scene.clearColor = new Color4(0.1, 0.2, 0.8, 1)
         let camera = new ArcRotateCamera('camera', -Math.PI / 2, Math.PI / 2, Math.PI,
             Vector3.Zero(), scene);
         camera.attachControl(canvas);
-        let light = new HemisphericLight('light', new Vector3(0, 11, 0), scene);
-        let gl = new GlowLayer("gl", scene);
+        let light = new HemisphericLight('light', new Vector3(0, -100, 0), scene);
+        let light2 = new HemisphericLight('light', new Vector3(0, 100, 0), scene);
+        // let gl = new GlowLayer("gl", scene);
+        // gl.blurKernelSize = 32;
+        // SceneLoader.ImportMesh('', '', "2222.glb", scene, (meshes, an, bb, cc) => {
+        //     meshes.forEach((mesh) => {
+        //         if (mesh.name.includes("Shield")) {
+        //             mesh.dispose();
+        //         }
+        //     })
 
-        gl.blurKernelSize = 2;
-        let hl = new HighlightLayer("hl",scene);
-        let a = '𝄞'; 
-        console.log(a.length);
-        SceneLoader.ImportMesh('', '', "2222.glb", scene, (meshes, an, bb, cc) => {
-            meshes.forEach((mesh) => {
-                if (mesh.name.includes("Shield")) {
-                    mesh.dispose();
-                }
-            })
-          
-           
-            meshes.forEach((mesh) => {
-                // mesh.enableEdgesRendering()
-                let color = Color3.FromHexString("#91f6fe");
-                mesh.enableEdgesRendering();
-                mesh.edgesColor = Color4.FromColor3(color,1);
-                let shader = outLineAlphaByMesh(scene, mesh,color,1);
 
-                console.log(shader.getClassName());
-                
-                const mat2 = shader.mat;
-                this.matList.push(shader);
-                mesh.material = mat2;
-                // mesh instanceof Mesh &&hl.addMesh(mesh,Color3.FromHexString("#91f6fe"),true);
-            })
-        })
-        scene.onNewMeshAddedObservable.add(()=>{
+        //     meshes.forEach((mesh) => {
+        //         // mesh.enableEdgesRendering()
+        //         let color = Color3.FromHexString("#91f6fe");
+        //         mesh.enableEdgesRendering();
+        //         mesh.edgesColor = Color4.FromColor3(color, 1);
+        //         let shader = outLineAlphaByMesh(scene, mesh, color, 1);
+
+
+
+        //         const mat2 = shader.mat;
+        //         this.matList.push(shader);
+        //         mesh.material = mat2;
+        //         gl.referenceMeshToUseItsOwnMaterial(mesh);
+        //         // mesh instanceof Mesh &&hl.addMesh(mesh,Color3.FromHexString("#91f6fe"),true);
+        //     })
+        // })
+        scene.onNewMeshAddedObservable.add(() => {
             console.log("hello!");
         })
-        scene.onMeshImportedObservable.add(()=>{
-           
+        scene.onMeshImportedObservable.add(() => {
+
         })
-        let it = 0;
-        // scene.onBeforeCameraRenderObservable.add(()=>{
-        //     it+=0.01;
-        //     gl.intensity = 0.5*Math.abs(Math.sin(it));
-        // })
-        let gizmo = new GizmoManager(scene);
-        gizmo.positionGizmoEnabled = true;
+
+        // let gizmo = new GizmoManager(scene);
+        // gizmo.positionGizmoEnabled = true;
         let result;
         // scene.debugLayer.show();
-        scene.onPointerDown = () => {
-            result = scene.pick(scene.pointerX, scene.pointerY, (mesh => !mesh.name.includes("root")));
-            if (result?.pickedMesh) {
-                console.log(result?.pickedMesh.name)
-            }
-        }
-
+        // scene.onPointerDown = () => {
+        //     result = scene.pick(scene.pointerX, scene.pointerY, (mesh => !mesh.name.includes("root")));
+        //     if (result?.pickedMesh) {
+        //         console.log(result?.pickedMesh.name)
+        //     }
+        // }
+        let box = MeshBuilder.CreatePlane("box",{size:10});
+        let box2 = MeshBuilder.CreatePlane("box",{size:10});
+        box2.position.x +=5;
+        createHtmlMesh(box,this.engine.getRenderingCanvas() as HTMLCanvasElement,"https://www.huya.com");
         return scene
     }
     getBoundingBoxInfo(nodes: AbstractMesh[]) {
@@ -174,5 +173,5 @@ export class SceneManager {
         // newTexture.uAng = oldTexture.uAng
         // newTexture.uOffset = oldTexture.uOffset;
         // newTexture.vOffset = oldTexture.vOffset;
-      }
+    }
 }

@@ -562,7 +562,6 @@ export function outLineAlphaByMesh(scene: Scene, mesh: AbstractMesh,color:string
         "   float alpha = distanceTwoVec3(center,vPosition)*k /distance;\r\n" +
         "   vec3 color = changeColor;\r\n"+
         "   alpha = modelDot * pow(alpha,power);\r\n"+
-        
         "   gl_FragColor = vec4(color,alpha);\r\n" +
         "}\r\n";
     let mat = new ShaderMaterial("shader", scene, {
