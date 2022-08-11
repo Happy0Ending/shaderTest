@@ -27,13 +27,9 @@ const onChange = (info:{type:string,name:string,value:string|number})=>{
 </script>
 
 <template>
-  <div class="block">
-    <a-slider v-model:value="power" :min="-3" :max="5" :step = '0.1' @change="onChange(shaderMat.getPow())" />
-    <a-slider v-model:value="k" :min="0" :max="5" :step = '0.1' @change="onChange(shaderMat.getK())"/>
-    <el-color-picker v-model="color" size="mini" @change="onChange(shaderMat.getColor())" ></el-color-picker>
+  <div id = "parent">
+    <canvas id="renderCanvas"></canvas>
   </div>
-  
-  <canvas id="renderCanvas"></canvas>
 </template>
 
 

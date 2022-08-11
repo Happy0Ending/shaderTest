@@ -77,6 +77,9 @@ export class SceneManager {
         let box2 = MeshBuilder.CreatePlane("box",{size:10});
         box2.position.x +=5;
         createHtmlMesh(box,this.engine.getRenderingCanvas() as HTMLCanvasElement,"https://www.huya.com");
+        setTimeout(() => {
+            // createHtmlMesh(box2,this.engine.getRenderingCanvas() as HTMLCanvasElement,"https://www.huya.com");
+        }, 3000);
         return scene
     }
     getBoundingBoxInfo(nodes: AbstractMesh[]) {
