@@ -24,38 +24,36 @@ export class SceneManager {
     }
     createScene(engine: Engine, canvas: HTMLCanvasElement) {
         let scene = new Scene(engine);
-        scene.clearColor = new Color4(0.1, 0.2, 0.8, 1)
+        scene.clearColor = new Color4(0, 0, 0, 1)
         let camera = new ArcRotateCamera('camera', -Math.PI / 2, Math.PI / 2, Math.PI,
             Vector3.Zero(), scene);
         camera.attachControl(canvas);
         let light = new HemisphericLight('light', new Vector3(0, -100, 0), scene);
         let light2 = new HemisphericLight('light', new Vector3(0, 100, 0), scene);
-        // let gl = new GlowLayer("gl", scene);
-        // gl.blurKernelSize = 32;
-        // SceneLoader.ImportMesh('', '', "2222.glb", scene, (meshes, an, bb, cc) => {
-        //     meshes.forEach((mesh) => {
-        //         if (mesh.name.includes("Shield")) {
-        //             mesh.dispose();
-        //         }
-        //     })
+        let gl = new GlowLayer("gl", scene);
+        gl.blurKernelSize = 32;
+        SceneLoader.ImportMesh('', '', "2222.glb", scene, (meshes, an, bb, cc) => {
+            meshes.forEach((mesh) => {
+                if (mesh.name.includes("Shield")) {
+                    mesh.dispose();
+                }
+            })
 
 
-        //     meshes.forEach((mesh) => {
-        //         // mesh.enableEdgesRendering()
-        //         let color = Color3.FromHexString("#91f6fe");
-        //         mesh.enableEdgesRendering();
-        //         mesh.edgesColor = Color4.FromColor3(color, 1);
-        //         let shader = outLineAlphaByMesh(scene, mesh, color, 1);
+            meshes.forEach((mesh) => {
+                // mesh.enableEdgesRendering()
+                let color = Color3.FromHexString("#91f6fe");
+                mesh.enableEdgesRendering();
+                mesh.edgesColor = Color4.FromColor3(color, 1);
+                let shader = outLineAlphaByMesh(scene, mesh, color, 1)
 
-
-
-        //         const mat2 = shader.mat;
-        //         this.matList.push(shader);
-        //         mesh.material = mat2;
-        //         gl.referenceMeshToUseItsOwnMaterial(mesh);
-        //         // mesh instanceof Mesh &&hl.addMesh(mesh,Color3.FromHexString("#91f6fe"),true);
-        //     })
-        // })
+                const mat2 = shader.mat;
+                this.matList.push(shader);
+                mesh.material = mat2;
+                // gl.referenceMeshToUseItsOwnMaterial(mesh);
+                // mesh instanceof Mesh &&hl.addMesh(mesh,Color3.FromHexString("#91f6fe"),true);
+            })
+        })
         scene.onNewMeshAddedObservable.add(() => {
             console.log("hello!");
         })
@@ -73,13 +71,13 @@ export class SceneManager {
         //         console.log(result?.pickedMesh.name)
         //     }
         // }
-        let box = MeshBuilder.CreatePlane("box",{size:10});
-        let box2 = MeshBuilder.CreatePlane("box",{size:10});
-        box2.position.x +=5;
-        createHtmlMesh(box,this.engine.getRenderingCanvas() as HTMLCanvasElement,"https://www.huya.com");
-        setTimeout(() => {
-            // createHtmlMesh(box2,this.engine.getRenderingCanvas() as HTMLCanvasElement,"https://www.huya.com");
-        }, 3000);
+        // let box = MeshBuilder.CreatePlane("box",{size:10});
+        // let box2 = MeshBuilder.CreatePlane("box",{size:10});
+        // box2.position.x +=5;
+        // createHtmlMesh(box,this.engine.getRenderingCanvas() as HTMLCanvasElement,"https://www.huya.com");
+        // setTimeout(() => {
+        //     // createHtmlMesh(box2,this.engine.getRenderingCanvas() as HTMLCanvasElement,"https://www.huya.com");
+        // }, 3000);
         return scene
     }
     getBoundingBoxInfo(nodes: AbstractMesh[]) {
