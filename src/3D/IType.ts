@@ -1,4 +1,5 @@
 export enum IType{
     shaderMaterial = "shaderMaterial",
-    meshEdge ="meshEdge"
+    meshEdge ="meshEdge",
+    glowLayer = "glowLayer"
 }

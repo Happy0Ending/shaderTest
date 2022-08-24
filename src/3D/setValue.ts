@@ -1,12 +1,12 @@
-import { AbstractMesh, Color3, Color4, ShaderMaterial } from "babylonjs";
-import { IEdges, IshaderMatInfo } from "./IProperty";
+import { AbstractMesh, Color3, Color4, GlowLayer, ShaderMaterial } from "babylonjs";
+import { object } from "vue-types";
+import { IEdges, IGlInfo, IshaderMatInfo } from "./IProperty";
 import { setUniform2 } from "./shaderType";
 import { toArray } from "./utils";
 
 export function setValueMeshEdge(mesh: AbstractMesh | AbstractMesh[], info: IEdges) {
     const meshes = toArray(mesh);
     meshes.forEach((mesh) => {
-
         Object.keys(info).forEach((key) => {
             switch (key) {
                 case "edgesWidth":
@@ -20,11 +20,17 @@ export function setValueMeshEdge(mesh: AbstractMesh | AbstractMesh[], info: IEdg
         })
     })
 }
-export function setValueShaderMaterial(mat:ShaderMaterial,info:IshaderMatInfo ) {
+export function setValueShaderMaterial(mat: ShaderMaterial, info: IshaderMatInfo) {
     switch (true) {
-        case info.type==="float":
+        case info.type === "float":
             return mat.setFloat(info.name as string, info.value as number);
-        case info.type==="Color3":
+        case info.type === "Color3":
             return mat.setColor3(info.name as string, Color3.FromHexString(info.value as string));
     }
+}
+
+export function setValueGlowLayer(gl: GlowLayer, info: IGlInfo) {
+    Object.keys(info).forEach((key) => {
+        gl[key as keyof IGlInfo] = info[key as keyof IGlInfo] as number;
+    })
 }

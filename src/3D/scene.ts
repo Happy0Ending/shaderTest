@@ -1,37 +1,38 @@
-import { AbstractMesh, ArcRotateCamera, Color3, Color4, Engine, GizmoManager, GlowLayer, HemisphericLight, HighlightLayer, Matrix, MeshBuilder, Scene, SceneLoader, Texture, Vector3 } from "babylonjs";
-import { outLineAlphaByMesh } from "./shader";
+import { AbstractMesh, ArcRotateCamera, BoxParticleEmitter, Color3, Color4, Engine, GizmoManager, GlowLayer, HemisphericLight, HighlightLayer, Matrix, MeshBuilder, Scene, SceneLoader, Texture, Vector3 } from "babylonjs";
+import { gradientMat, outLineAlphaByMesh } from "./shader";
 import 'babylonjs-loaders'
 import { Ishader } from "./shaderType";
-import { setValueMeshEdge, setValueShaderMaterial } from "./setValue";
-import { IEdges, IshaderMatInfo } from "./IProperty";
+import { setValueGlowLayer, setValueMeshEdge, setValueShaderMaterial } from "./setValue";
+import { IEdges, IGlInfo, IshaderMatInfo } from "./IProperty";
 import { IOptions } from "./Ioptions";
 import { IType } from "./IType";
-import { AdvancedDynamicTexture, TextBlock } from "babylonjs-gui";
-import { createHtmlMesh } from "./GUI/CSS3DRender";
 export class SceneManager {
     public engine: Engine;
     public activeScene: Scene;
     public matList: Ishader[];
+    public gl: GlowLayer | null = null;
     public scene: Scene;
     constructor(canvas: HTMLCanvasElement) {
         this.engine = new Engine(canvas);
+        this.matList = [];
         this.scene = this.createScene(this.engine, canvas);
         this.activeScene = this.scene;
-        this.matList = [];
         this.engine.runRenderLoop(() => {
             this.activeScene.render();
         })
+
     }
     createScene(engine: Engine, canvas: HTMLCanvasElement) {
         let scene = new Scene(engine);
-        scene.clearColor = new Color4(0.1, 0.2, 0.8, 1)
+        scene.clearColor = new Color4(0, 0, 0, 1)
         let camera = new ArcRotateCamera('camera', -Math.PI / 2, Math.PI / 2, Math.PI,
             Vector3.Zero(), scene);
         camera.attachControl(canvas);
         let light = new HemisphericLight('light', new Vector3(0, -100, 0), scene);
         let light2 = new HemisphericLight('light', new Vector3(0, 100, 0), scene);
-        // let gl = new GlowLayer("gl", scene);
-        // gl.blurKernelSize = 32;
+        let gl = new GlowLayer("gl", scene);
+        gl.blurKernelSize = 32;
+        this.gl = gl;
         // SceneLoader.ImportMesh('', '', "2222.glb", scene, (meshes, an, bb, cc) => {
         //     meshes.forEach((mesh) => {
         //         if (mesh.name.includes("Shield")) {
@@ -47,25 +48,33 @@ export class SceneManager {
         //         mesh.edgesColor = Color4.FromColor3(color, 1);
         //         let shader = outLineAlphaByMesh(scene, mesh, color, 1);
 
-
-
         //         const mat2 = shader.mat;
-        //         this.matList.push(shader);
+        //         // this.matList.push(shader);
         //         mesh.material = mat2;
         //         gl.referenceMeshToUseItsOwnMaterial(mesh);
         //         // mesh instanceof Mesh &&hl.addMesh(mesh,Color3.FromHexString("#91f6fe"),true);
         //     })
         // })
-        scene.onNewMeshAddedObservable.add(() => {
-            console.log("hello!");
-        })
-        scene.onMeshImportedObservable.add(() => {
+        // const box = MeshBuilder.CreateBox("box",{size:4});
+        // box.position.y = 10;
+        // const mat1 = outLineAlphaByMesh(scene, box, Color3.FromHexString("#91f6fe"), 1);
+        // box.material = mat1.mat;
+        // this.matList.push(mat1);
 
-        })
+        
+        const box2 = MeshBuilder.CreateBox("Box2");
+        box2.position.z  += 8
+        box2.material = null;
+        const mat  = gradientMat(scene,box2);
+        box2.material = mat;
+        
+        const sphere = MeshBuilder.CreateSphere("sphere");
+        // const mat2 = outLineAlphaByMesh(scene, sphere, Color3.FromHexString("#91f6fe"), 1);
+        sphere.material = mat;
+        // this.matList.push(mat2);
+        sphere.position.z = 20;
+        
 
-        // let gizmo = new GizmoManager(scene);
-        // gizmo.positionGizmoEnabled = true;
-        let result;
         // scene.debugLayer.show();
         // scene.onPointerDown = () => {
         //     result = scene.pick(scene.pointerX, scene.pointerY, (mesh => !mesh.name.includes("root")));
@@ -73,13 +82,13 @@ export class SceneManager {
         //         console.log(result?.pickedMesh.name)
         //     }
         // }
-        let box = MeshBuilder.CreatePlane("box",{size:10});
-        let box2 = MeshBuilder.CreatePlane("box",{size:10});
-        box2.position.x +=5;
-        createHtmlMesh(box,this.engine.getRenderingCanvas() as HTMLCanvasElement,"https://www.huya.com");
-        setTimeout(() => {
-            // createHtmlMesh(box2,this.engine.getRenderingCanvas() as HTMLCanvasElement,"https://www.huya.com");
-        }, 3000);
+        // let box = MeshBuilder.CreatePlane("box",{size:10});
+        // let box2 = MeshBuilder.CreatePlane("box",{size:10});
+        // box2.position.x +=5;
+        // createHtmlMesh(box,this.engine.getRenderingCanvas() as HTMLCanvasElement,"https://www.huya.com");
+        // setTimeout(() => {
+        //     // createHtmlMesh(box2,this.engine.getRenderingCanvas() as HTMLCanvasElement,"https://www.huya.com");
+        // }, 3000);
         return scene
     }
     getBoundingBoxInfo(nodes: AbstractMesh[]) {
@@ -104,8 +113,9 @@ export class SceneManager {
         this.activeScene.dispose();
     }
     changeShaderMat(property: IshaderMatInfo) {
-
+        console.log(this.matList);
         this.matList.forEach((IShader) => {
+            console.log('123');
             let options: IOptions = {
                 type: IType.shaderMaterial,
                 target: IShader.mat,
@@ -122,7 +132,15 @@ export class SceneManager {
             value: property
         }
         this.setValue(options);
+    }
 
+    changeGlOption(property: IGlInfo) {
+        let options: IOptions = {
+            type: IType.glowLayer,
+            target: this.gl,
+            value: property
+        }
+        this.setValue(options);
     }
 
     setValue(options: IOptions) {
@@ -131,6 +149,8 @@ export class SceneManager {
                 return setValueMeshEdge(options.target, options.value);
             case IType.shaderMaterial:
                 return setValueShaderMaterial(options.target, options.value);
+            case IType.glowLayer:
+                return setValueGlowLayer(options.target, options.value);
         }
 
     }
