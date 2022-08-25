@@ -1,7 +1,7 @@
 import { ref } from "vue";
 
-const intensity = ref(0);
-const blurKernelSize = ref(0);
+const intensity = ref(1.0);
+const blurKernelSize = ref(32);
 
 export function UseGl() {
     const getIntensity = () => {

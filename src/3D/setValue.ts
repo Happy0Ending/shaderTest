@@ -1,6 +1,8 @@
 import { AbstractMesh, Color3, Color4, GlowLayer, ShaderMaterial } from "babylonjs";
 import { object } from "vue-types";
+import { IOptions } from "./Ioptions";
 import { IEdges, IGlInfo, IshaderMatInfo } from "./IProperty";
+import { IType } from "./IType";
 import { setUniform2 } from "./shaderType";
 import { toArray } from "./utils";
 
@@ -33,4 +35,16 @@ export function setValueGlowLayer(gl: GlowLayer, info: IGlInfo) {
     Object.keys(info).forEach((key) => {
         gl[key as keyof IGlInfo] = info[key as keyof IGlInfo] as number;
     })
+}
+
+export function setValue(options: IOptions) {
+    switch (options.type) {
+        case IType.meshEdge:
+            return setValueMeshEdge(options.target, options.value);
+        case IType.shaderMaterial:
+            return setValueShaderMaterial(options.target, options.value);
+        case IType.glowLayer:
+            return setValueGlowLayer(options.target, options.value);
+    }
+
 }

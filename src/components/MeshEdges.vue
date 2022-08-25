@@ -1,32 +1,33 @@
 <template>
     <div id="meshEdgeStyle">
 
-        <p>边框线宽度
+        <p>边框线宽度{{edgesWidth}}
             <a-slider v-model:value="edgesWidth" :min="0" :max="5" :step='0.1'
                 @change="onChange(meshEdgeInfo.getEdgesWidth())" />
         </p>
-        <p>边框线颜色:
+        <p>边框线颜色:{{edgesColor}}
             <el-color-picker v-model="edgesColor" size="mini" @change="onChange(meshEdgeInfo.getEdgesColor())">
             </el-color-picker>
         </p>
-        <p>透明补偿值:
+        <p>透明补偿值:{{k}}
             <a-slider v-model:value="k" :min="0" :max="2" :step='0.1' @change="onMaterialChange(shaderMat.getK())" />
         </p>
 
-        <p>透明衰退值:
+        <p>透明衰退值:{{power}}
             <a-slider v-model:value="power" :min="0" :max="3" :step='0.1'
                 @change="onMaterialChange(shaderMat.getPow())" />
         </p>
 
 
-        <p>透明色:<el-color-picker v-model="color" size="mini" @change="onMaterialChange(shaderMat.getColor())">
+        <p>透明色:{{color}}
+            <el-color-picker v-model="color" size="mini" @change="onMaterialChange(shaderMat.getColor())">
             </el-color-picker>
         </p>
-        <p>模糊因子:
+        <p>模糊因子:{{blurKernelSize}}
             <a-slider v-model:value="blurKernelSize" :min="0" :max="64" :step='1'
                 @change="onGlChange(useGl.getBlurKernelSize())" />
         </p>
-        <p>模糊光强度:
+        <p>模糊光强度:{{intensity}}
             <a-slider v-model:value="intensity" :min="0" :max="2" :step='0.1'
                 @change="onGlChange(useGl.getIntensity())" />
         </p>
@@ -59,6 +60,7 @@ const blurKernelSize = useGl.blurKernelSize
 const onGlChange = (property: IGlInfo) => {
     GScene.changeGlOption(property);
 }
+
 </script>
 
 <style>

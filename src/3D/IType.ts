@@ -3,3 +3,9 @@ export enum IType{
     meshEdge ="meshEdge",
     glowLayer = "glowLayer"
 }
+export enum SceneType{
+    grientScene = "grientScene",
+    glScene = "glScene",
+    wireFrameScene = "wireFrameScene",
+    pbrScene = "pbrScene"
+}

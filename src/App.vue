@@ -3,12 +3,13 @@
 // Check out https://vuejs.org/api/sfc-script-setup.html#script-setup
 import HelloWorld from './components/HelloWorld.vue'
 import MeshEdges from './components/MeshEdges.vue';
+import SceneSelect from "./components/SceneSelect.vue";
 </script>
 
 <template>
- 
   <HelloWorld />
-  <!-- <MeshEdges/> -->
+  <MeshEdges/>
+  <SceneSelect/>
 </template>
 
 <style>

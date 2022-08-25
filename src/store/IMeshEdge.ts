@@ -1,8 +1,8 @@
 import { ref } from "vue";
 
-const meshEdgesWidth = ref(0);
+const meshEdgesWidth = ref(1);
 
-const meshEdgesColor = ref("")
+const meshEdgesColor = ref("#91f6fe");
 
 export function IMeshEdge() {
     const getEdgesWidth = () => {

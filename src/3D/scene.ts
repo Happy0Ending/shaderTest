@@ -1,26 +1,34 @@
-import { AbstractMesh, ArcRotateCamera, BoxParticleEmitter, Color3, Color4, Engine, GizmoManager, GlowLayer, HemisphericLight, HighlightLayer, Matrix, MeshBuilder, Scene, SceneLoader, Texture, Vector3 } from "babylonjs";
-import { gradientMat, outLineAlphaByMesh } from "./shader";
+import { AbstractMesh, ArcRotateCamera, Color3, Color4, Engine, GlowLayer, HemisphericLight, MeshBuilder, Scene, SceneLoader, Texture, Vector3 } from "babylonjs";
+import { outLineAlphaByMesh } from "./shader";
 import 'babylonjs-loaders'
 import { Ishader } from "./shaderType";
-import { setValueGlowLayer, setValueMeshEdge, setValueShaderMaterial } from "./setValue";
+import { setValue } from "./setValue";
 import { IEdges, IGlInfo, IshaderMatInfo } from "./IProperty";
 import { IOptions } from "./Ioptions";
-import { IType } from "./IType";
+import { IType, SceneType } from "./IType";
+import { gradientMatScene } from "./scene/grientScene";
+import { wireFrameScene } from "./scene/wireFrame";
+import { pbrScene } from "./scene/pbrScene";
 export class SceneManager {
     public engine: Engine;
     public activeScene: Scene;
     public matList: Ishader[];
     public gl: GlowLayer | null = null;
-    public scene: Scene;
+    public glScene: Scene;
+    public gradientScene: Scene;
+    public wireFrameScene: Scene;
+    public pbrScene: Scene;
     constructor(canvas: HTMLCanvasElement) {
         this.engine = new Engine(canvas);
         this.matList = [];
-        this.scene = this.createScene(this.engine, canvas);
-        this.activeScene = this.scene;
+        this.glScene = this.createScene(this.engine, canvas);
+        this.gradientScene = gradientMatScene(this.engine, canvas);
+        this.activeScene = this.glScene;
+        this.wireFrameScene = wireFrameScene(this.engine,canvas);
+        this.pbrScene = pbrScene(this.engine,canvas);
         this.engine.runRenderLoop(() => {
             this.activeScene.render();
         })
-
     }
     createScene(engine: Engine, canvas: HTMLCanvasElement) {
         let scene = new Scene(engine);
@@ -33,47 +41,49 @@ export class SceneManager {
         let gl = new GlowLayer("gl", scene);
         gl.blurKernelSize = 32;
         this.gl = gl;
-        // SceneLoader.ImportMesh('', '', "2222.glb", scene, (meshes, an, bb, cc) => {
-        //     meshes.forEach((mesh) => {
-        //         if (mesh.name.includes("Shield")) {
-        //             mesh.dispose();
-        //         }
-        //     })
+        SceneLoader.ImportMesh('', '', "2222.glb", scene, (meshes, an, bb, cc) => {
+            meshes.forEach((mesh) => {
+                if (mesh.name.includes("Shield")) {
+                    mesh.dispose();
+                }
+            })
 
 
-        //     meshes.forEach((mesh) => {
-        //         // mesh.enableEdgesRendering()
-        //         let color = Color3.FromHexString("#91f6fe");
-        //         mesh.enableEdgesRendering();
-        //         mesh.edgesColor = Color4.FromColor3(color, 1);
-        //         let shader = outLineAlphaByMesh(scene, mesh, color, 1);
+            meshes.forEach((mesh) => {
+                // mesh.enableEdgesRendering()
+                let color = Color3.FromHexString("#91f6fe");
+                mesh.enableEdgesRendering();
+                mesh.edgesColor = Color4.FromColor3(color, 1);
+                let shader = outLineAlphaByMesh(scene, mesh, color, 1);
 
-        //         const mat2 = shader.mat;
-        //         // this.matList.push(shader);
-        //         mesh.material = mat2;
-        //         gl.referenceMeshToUseItsOwnMaterial(mesh);
-        //         // mesh instanceof Mesh &&hl.addMesh(mesh,Color3.FromHexString("#91f6fe"),true);
-        //     })
-        // })
-        // const box = MeshBuilder.CreateBox("box",{size:4});
-        // box.position.y = 10;
-        // const mat1 = outLineAlphaByMesh(scene, box, Color3.FromHexString("#91f6fe"), 1);
-        // box.material = mat1.mat;
-        // this.matList.push(mat1);
+                const mat2 = shader.mat;
+                this.matList.push(shader);
+                mesh.material = mat2;
+                gl.referenceMeshToUseItsOwnMaterial(mesh);
+                // mesh instanceof Mesh &&hl.addMesh(mesh,Color3.FromHexString("#91f6fe"),true);
+            })
+        })
+        const box = MeshBuilder.CreateSphere("box", { diameter: 4 });
+        box.position.y = 10;
+        const mat1 = outLineAlphaByMesh(scene, box, Color3.FromHexString("#91f6fe"), 1);
+        box.material = mat1.mat;
+        this.matList.push(mat1);
+        this.gl.referenceMeshToUseItsOwnMaterial(box);
 
-        
-        const box2 = MeshBuilder.CreateBox("Box2");
-        box2.position.z  += 8
-        box2.material = null;
-        const mat  = gradientMat(scene,box2);
-        box2.material = mat;
-        
-        const sphere = MeshBuilder.CreateSphere("sphere");
-        // const mat2 = outLineAlphaByMesh(scene, sphere, Color3.FromHexString("#91f6fe"), 1);
-        sphere.material = mat;
-        // this.matList.push(mat2);
-        sphere.position.z = 20;
-        
+        // const box2 = MeshBuilder.CreateBox("Box2");
+        // box2.position.z  += 8
+        // box2.material = null;
+        // const mat  = gradientMat(scene,box2);
+        // box2.material = mat;
+        // box2.enableEdgesRendering();
+        // box2.edgesColor = Color4.FromHexString("#2c59a0");
+        // box2.edgesWidth = 2;
+        // const sphere = MeshBuilder.CreateSphere("sphere");
+        // // const mat2 = outLineAlphaByMesh(scene, sphere, Color3.FromHexString("#91f6fe"), 1);
+        // sphere.material = mat;
+        // // this.matList.push(mat2);
+        // sphere.position.z = 20;
+
 
         // scene.debugLayer.show();
         // scene.onPointerDown = () => {
@@ -91,6 +101,7 @@ export class SceneManager {
         // }, 3000);
         return scene
     }
+
     getBoundingBoxInfo(nodes: AbstractMesh[]) {
         let min: Vector3 = Vector3.Zero();
         let max: Vector3 = Vector3.Zero();
@@ -121,17 +132,17 @@ export class SceneManager {
                 target: IShader.mat,
                 value: property
             }
-            this.setValue(options);
+            setValue(options);
         })
     }
 
     changeMeshEdge(property: IEdges) {
         let options = {
             type: IType.meshEdge,
-            target: this.scene.meshes,
+            target: this.glScene.meshes,
             value: property
         }
-        this.setValue(options);
+        setValue(options);
     }
 
     changeGlOption(property: IGlInfo) {
@@ -140,20 +151,10 @@ export class SceneManager {
             target: this.gl,
             value: property
         }
-        this.setValue(options);
+        setValue(options);
     }
 
-    setValue(options: IOptions) {
-        switch (options.type) {
-            case IType.meshEdge:
-                return setValueMeshEdge(options.target, options.value);
-            case IType.shaderMaterial:
-                return setValueShaderMaterial(options.target, options.value);
-            case IType.glowLayer:
-                return setValueGlowLayer(options.target, options.value);
-        }
 
-    }
     arrayBufferToBase64Img = (buffer: Uint8Array) => {
 
         let str = "";
@@ -163,6 +164,23 @@ export class SceneManager {
 
 
         return window.btoa(str);
+    }
+
+    selectScene(type: SceneType) {
+        switch (type) {
+            case SceneType.glScene:
+                this.activeScene = this.glScene
+                break;
+            case SceneType.grientScene:
+                this.activeScene = this.gradientScene
+                break;
+            case SceneType.wireFrameScene:
+                this.activeScene = this.wireFrameScene;
+                break;
+            case SceneType.pbrScene:
+                this.activeScene = this.pbrScene;
+                break;
+        }
     }
     /**
  * uint8array转Base64

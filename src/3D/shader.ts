@@ -181,8 +181,8 @@ export function UVScaleByTime(scene: Scene, step: number) {
 
 
 
-export function gradientMat(scene: Scene, mesh: Mesh) {
-    Effect.ShadersStore["gradientVertexShader"] = "\r\n" +
+export function gradientMat(scene: Scene,name:string, mesh: Mesh) {
+    Effect.ShadersStore["gradient"+name+"VertexShader"] = "\r\n" +
     "precision highp float;\r\n" +
 
     "//attribute\r\n" +
@@ -204,7 +204,7 @@ export function gradientMat(scene: Scene, mesh: Mesh) {
     "   vNormal = normal;\r\n" +
     "}\r\n"
     ;
-Effect.ShadersStore["gradientFragmentShader"] = "\r\n" +
+Effect.ShadersStore["gradient"+name+"FragmentShader"] = "\r\n" +
     "precision highp float;\r\n" +
 
     "varying vec3 vPosition;\r\n" +
@@ -215,15 +215,16 @@ Effect.ShadersStore["gradientFragmentShader"] = "\r\n" +
     "uniform vec3 mainColor;\r\n"+
     "uniform float maxHeight;\r\n"+
     "uniform float minHeight;\r\n"+
+    "uniform float alphaK;\r\n"+
     "void main(void) {\r\n" +
     "   float height = maxHeight - minHeight;\r\n"+
     "   vec3 color = mainColor;\r\n"+
     "   float alpha = (vPosition.y-minHeight)/height;\r\n"+
-    "   gl_FragColor = vec4(color,0.15+pow(alpha,0.5)*alpha*0.85);\r\n" +
+    "   gl_FragColor = vec4(color,alphaK+pow(alpha,0.5)*alpha*(1.0-alphaK));\r\n" +
     "}\r\n";
 let mat = new ShaderMaterial("shader", scene, {
-    vertex: "gradient",
-    fragment: "gradient"
+    vertex: "gradient"+name,
+    fragment: "gradient"+name
 }, {
     attributes: ["normal", "position", 'uv'],
     uniforms: ["world", "worldView", "worldViewProjection", "view", "projection"],
@@ -237,10 +238,10 @@ let mat = new ShaderMaterial("shader", scene, {
     const minHeight = mesh.getBoundingInfo().boundingBox.minimumWorld.y;
     mat.setFloat("maxHeight",maxHeight);
     mat.setFloat("minHeight",minHeight);
+    let alphaK = 0.15;
+    mat.setFloat("alphaK",alphaK);
     return mat;
 }
-
-
 
 export function outSkinAlphaByMesh(scene: Scene, mesh: AbstractMesh, color: string | Color3, pow: number) {
     Effect.ShadersStore["customVertexShader"] = "\r\n" +
