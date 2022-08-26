@@ -2,7 +2,7 @@
 
     <div class="selectScene">
 
-        <el-select class="m-2" :placeholder="valueType" @change = "onchange" >
+        <el-select class="m-2" :placeholder="valueType" @change="onchange">
             <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value" />
         </el-select>
     </div>
@@ -29,7 +29,7 @@ const options = [
         value: 'grientScene',
         label: '渐变场景',
     },
-     {
+    {
         value: 'wireFrameScene',
         label: '线框场景',
     },
@@ -37,6 +37,18 @@ const options = [
         value: 'pbrScene',
         label: '物理质感场景',
     },
+    {
+        value: "reflectScene",
+        label: "反射流动场景"
+    },
+    {
+        value: "glassScene",
+        label: "玻璃透光场景"
+    },
+     {
+        value: "boliScene",
+        label: "有色玻璃场景"
+    }
 ]
 
 </script>

@@ -7,5 +7,8 @@ export enum SceneType{
     grientScene = "grientScene",
     glScene = "glScene",
     wireFrameScene = "wireFrameScene",
-    pbrScene = "pbrScene"
+    pbrScene = "pbrScene",
+    reflectScene= "reflectScene",
+    glassScene = "glassScene",
+    boliScene= "boliScene"
 }

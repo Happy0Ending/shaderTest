@@ -9,6 +9,9 @@ import { IType, SceneType } from "./IType";
 import { gradientMatScene } from "./scene/grientScene";
 import { wireFrameScene } from "./scene/wireFrame";
 import { pbrScene } from "./scene/pbrScene";
+import { reflectScene } from "./scene/reflectScene";
+import { glassScene } from "./scene/glassScene";
+import { boliScene } from "./scene/glassBoliScene";
 export class SceneManager {
     public engine: Engine;
     public activeScene: Scene;
@@ -18,14 +21,20 @@ export class SceneManager {
     public gradientScene: Scene;
     public wireFrameScene: Scene;
     public pbrScene: Scene;
+    public reflectScene: Scene;
+    public glassScene: Scene;
+    public boliScene:Scene;
     constructor(canvas: HTMLCanvasElement) {
         this.engine = new Engine(canvas);
         this.matList = [];
         this.glScene = this.createScene(this.engine, canvas);
         this.gradientScene = gradientMatScene(this.engine, canvas);
         this.activeScene = this.glScene;
-        this.wireFrameScene = wireFrameScene(this.engine,canvas);
-        this.pbrScene = pbrScene(this.engine,canvas);
+        this.wireFrameScene = wireFrameScene(this.engine, canvas);
+        this.pbrScene = pbrScene(this.engine, canvas);
+        this.reflectScene = reflectScene(this.engine, canvas);
+        this.glassScene = glassScene(this.engine, canvas);
+        this.boliScene = boliScene(this.engine,canvas);
         this.engine.runRenderLoop(() => {
             this.activeScene.render();
         })
@@ -179,6 +188,14 @@ export class SceneManager {
                 break;
             case SceneType.pbrScene:
                 this.activeScene = this.pbrScene;
+                break;
+            case SceneType.reflectScene:
+                this.activeScene = this.reflectScene;
+                break;
+            case SceneType.glassScene:
+                this.activeScene = this.glassScene;
+            case SceneType.boliScene:
+                this.activeScene = this.boliScene;
                 break;
         }
     }
