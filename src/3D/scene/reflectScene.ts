@@ -62,6 +62,7 @@ export function reflectScene(engine: Engine, canvas: HTMLCanvasElement) {
     })
 	// Add skybox and ground to the reflection and refraction
 	water.addToRenderList(skybox);
+	
 	// water.addToRenderList(ground);
 	
 	// Assign the water material

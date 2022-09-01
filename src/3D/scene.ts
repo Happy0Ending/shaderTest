@@ -49,6 +49,7 @@ export class SceneManager {
         let light2 = new HemisphericLight('light', new Vector3(0, 100, 0), scene);
         let gl = new GlowLayer("gl", scene);
         gl.blurKernelSize = 32;
+        gl.intensity
         this.gl = gl;
         SceneLoader.ImportMesh('', '', "2222.glb", scene, (meshes, an, bb, cc) => {
             meshes.forEach((mesh) => {

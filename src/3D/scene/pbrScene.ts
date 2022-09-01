@@ -19,6 +19,7 @@ export function pbrScene(engine: Engine, canvas: HTMLCanvasElement) {
     // mat.roughness =1;
     mat.metallic = 1;
     mat.roughness = 0;
+    mat.alpha = 0.5;
     // mat.albedoColor =  Color3.Red();
     box2.material = mat;
     
@@ -29,7 +30,6 @@ export function pbrScene(engine: Engine, canvas: HTMLCanvasElement) {
    
     sphere.material = mat;
     sphere.position.z = 20;
-    
     
 
     const adTexture = AdvancedDynamicTexture.CreateFullscreenUI("gradientMat", true, scene);
