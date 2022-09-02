@@ -48,7 +48,11 @@ const options = [
      {
         value: "boliScene",
         label: "有色玻璃场景"
+    }, {
+        value: "MapScene",
+        label: "地图场景"
     }
+
 ]
 
 </script>

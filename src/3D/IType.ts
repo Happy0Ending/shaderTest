@@ -10,5 +10,6 @@ export enum SceneType{
     pbrScene = "pbrScene",
     reflectScene= "reflectScene",
     glassScene = "glassScene",
-    boliScene= "boliScene"
+    boliScene= "boliScene",
+    MapScene = "MapScene",
 }

@@ -12,6 +12,9 @@ import { pbrScene } from "./scene/pbrScene";
 import { reflectScene } from "./scene/reflectScene";
 import { glassScene } from "./scene/glassScene";
 import { boliScene } from "./scene/glassBoliScene";
+import { textureScene } from "./scene/textureScene";
+import { mapScene } from "./scene/mapScene";
+import { Breadcrumb } from "ant-design-vue";
 export class SceneManager {
     public engine: Engine;
     public activeScene: Scene;
@@ -24,17 +27,20 @@ export class SceneManager {
     public reflectScene: Scene;
     public glassScene: Scene;
     public boliScene:Scene;
+    public mapScene:Scene;
     constructor(canvas: HTMLCanvasElement) {
         this.engine = new Engine(canvas);
         this.matList = [];
-        this.glScene = this.createScene(this.engine, canvas);
-        this.gradientScene = gradientMatScene(this.engine, canvas);
-        this.activeScene = this.glScene;
-        this.wireFrameScene = wireFrameScene(this.engine, canvas);
-        this.pbrScene = pbrScene(this.engine, canvas);
-        this.reflectScene = reflectScene(this.engine, canvas);
-        this.glassScene = glassScene(this.engine, canvas);
-        this.boliScene = boliScene(this.engine,canvas);
+        // let scene = this.createScene(this.engine, canvas);
+        // // this.glScene = textureScene(this.engine, canvas);
+        // this.gradientScene = gradientMatScene(this.engine, canvas);
+        // this.wireFrameScene = wireFrameScene(this.engine, canvas);
+        // this.pbrScene = pbrScene(this.engine, canvas);
+        // this.reflectScene = reflectScene(this.engine, canvas);
+        // this.glassScene = glassScene(this.engine, canvas);
+        // this.boliScene = boliScene(this.engine,canvas);
+        this.mapScene = mapScene(this.engine,canvas);
+        this.activeScene = this.mapScene;
         this.engine.runRenderLoop(() => {
             this.activeScene.render();
         })
@@ -197,6 +203,9 @@ export class SceneManager {
                 this.activeScene = this.glassScene;
             case SceneType.boliScene:
                 this.activeScene = this.boliScene;
+                break;
+            case SceneType.MapScene:
+                this.activeScene = this.mapScene
                 break;
         }
     }
