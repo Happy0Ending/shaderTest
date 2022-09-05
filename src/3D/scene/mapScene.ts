@@ -1,4 +1,4 @@
-import { ArcRotateCamera, Color3, Color4, CubeTexture, Effect, Engine, GlowLayer, HemisphericLight, Mesh, MeshBuilder, PostProcess, Scene, ShaderMaterial, StandardMaterial, Vector3 } from "babylonjs";
+import { ArcRotateCamera, Color3, Color4, CubeTexture, Effect, Engine, Gizmo, GizmoManager, GlowLayer, HemisphericLight, Mesh, MeshBuilder, PostProcess, Scene, ShaderMaterial, Space, StandardMaterial, Vector3 } from "babylonjs";
 import { AdvancedDynamicTexture, ColorPicker, Rectangle, Slider, TextBlock } from "babylonjs-gui";
 import { string } from "vue-types";
 import { gradientMat } from "../shader";
@@ -43,7 +43,7 @@ export function mapScene(engine: Engine, canvas: HTMLCanvasElement) {
     stringList[0].forEach((string) => {
         string.split("t").length > 1 && xList.push(Number(string.split("t")[1]));
     })
-    console.log("stringList", stringList);
+   
     const positionList: Vector3[][] = []
     for (let i = 1; i < stringList.length; i++) {//z
         //X
@@ -57,8 +57,12 @@ export function mapScene(engine: Engine, canvas: HTMLCanvasElement) {
     ribbon.position.z = 0;
     let shaderMat = colorShader("temp", scene);
     ribbon.material = shaderMat;
-    camera.setTarget(ribbon);
-
+    PivotPointCenter(ribbon);
+    camera.setTarget(ribbon.getBoundingInfo().boundingBox.centerWorld);
+    const gizmo = new GizmoManager(scene);
+    gizmo.positionGizmoEnabled = true;
+    gizmo.attachToMesh(ribbon);
+   
     return scene
 }
 export function CSVdataStringToVector3List(data: string) {
@@ -98,20 +102,22 @@ export function colorShader(name: string, scene: Scene) {
         varying vec3 vPosition;
         varying vec3 vUV;
         varying vec3 vNormal;
-        vec HSVToRGB(float h,float s,float v){
-            
+       
+        vec3 hsv2rgb_03(vec3 c)
+        {
+          vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
+          vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);
+          return c.z * mix(K.xxx, clamp(p - K.xxx,0.0,1.0), c.y);
         }
         vec3 transformColor(float height){
             // 颜色从deca71变化到deFF71 d:14 e:15 C:13 a:11 
             //颜色变化从25到40;
             // 冷红色：H330 S100 B100
             // 黄 色：H45   S100 B100
-            float h = 3.6*height-45.0 ;
-            float s = 100 ;
-            float v = 100;
-
-            vec3 color;
-            
+            float h =-0.01*height +0.15;
+            float s = 0.8;
+            float v =  0.8;
+            vec3 color = hsv2rgb_03(vec3(h,s,v));
             return color;
         }
         void main(void) {
@@ -128,5 +134,75 @@ export function colorShader(name: string, scene: Scene) {
         // needAlphaBlending: true,
         // needAlphaTesting: true
     })
+
     return mat;
+}
+export function colorGrad(name:string,scene:Scene){
+    Effect.ShadersStore[`${name}VertexShader`] =
+    `
+ precision highp float;
+//attribute
+attribute vec3 position;
+attribute vec2 uv;
+attribute vec3 normal;
+uniform mat4 worldViewProjection;
+varying vec3 vPosition;
+varying vec2 vUV;
+varying vec3 vNormal;
+void main(void) {
+   gl_Position = worldViewProjection*vec4(position,1.0);
+   vPosition = position;
+   vUV = uv;
+   vNormal = normal;
+}
+`
+
+Effect.ShadersStore[`${name}FragmentShader`] =
+    `
+    precision highp float;
+    varying vec3 vPosition;
+    varying vec3 vUV;
+    varying vec3 vNormal;
+   
+    vec3 hsv2rgb_03(vec3 c)
+    {
+      vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
+      vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);
+      return c.z * mix(K.xxx, clamp(p - K.xxx,0.0,1.0), c.y);
+    }
+    vec3 transformColor(float height){
+        // 颜色从deca71变化到deFF71 d:14 e:15 C:13 a:11 
+        //颜色变化从25到40;
+        // 冷红色：H330 S100 B100
+        // 黄 色：H45   S100 B100
+        float r = 1.0;
+        float g = 1.0-height/8.0/32.0;
+        float b =  0.5;
+        vec3 color = vec3(r,g,b);
+        return color;
+    }
+    void main(void) {
+    vec3 color = transformColor(vPosition.y);
+       gl_FragColor = vec4(color,1.0);
+    }
+`
+let mat = new ShaderMaterial("shader", scene, {
+    vertex: name,
+    fragment: name
+}, {
+    attributes: ["normal", "position", 'uv'],
+    uniforms: ["world", "worldView", "worldViewProjection", "view", "projection"],
+    // needAlphaBlending: true,
+    // needAlphaTesting: true
+})
+
+return mat;
+}
+export function PivotPointCenter(ribbon:Mesh){
+    const clonePostion = ribbon.getBoundingInfo().boundingBox.centerWorld.clone();
+    ribbon.position = Vector3.Zero().subtract(clonePostion);
+    ribbon.position.y +=ribbon.getBoundingInfo().boundingBox.extendSize.y;
+    ribbon.setPivotPoint(ribbon.position,Space.WORLD);
+    ribbon.bakeTransformIntoVertices(ribbon._worldMatrix);
+    ribbon.position = Vector3.Zero();
 }
