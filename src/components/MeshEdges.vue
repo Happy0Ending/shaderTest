@@ -31,6 +31,7 @@
             <a-slider v-model:value="intensity" :min="0" :max="2" :step='0.1'
                 @change="onGlChange(useGl.getIntensity())" />
         </p>
+        <!-- <a-input v-model:value="meshData.meshName.value" oninput=""/> -->
     </div>
 </template>
 <script setup lang="ts">
@@ -39,6 +40,7 @@ import { GScene } from '../global';
 import { Imat } from '../store/Imat';
 import { IMeshEdge } from '../store/ImeshEdge';
 import { UseGl } from '../store/useGL';
+
 
 let meshEdgeInfo = IMeshEdge();
 let edgesWidth = meshEdgeInfo.meshEdgesWidth;
@@ -60,6 +62,8 @@ const blurKernelSize = useGl.blurKernelSize
 const onGlChange = (property: IGlInfo) => {
     GScene.changeGlOption(property);
 }
+// const meshData = UseMesh();
+
 
 </script>
 

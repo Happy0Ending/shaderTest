@@ -9,12 +9,13 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@babylonjs/core": "^5.23.0",
+    "@babylonjs/gui": "^5.23.0",
+    "@babylonjs/loaders": "^5.23.0",
+    "@babylonjs/materials": "^5.23.0",
+    "@babylonjs/node-editor": "^5.23.0",
+    "@babylonjs/serializers": "^5.23.0",
     "ant-design-vue": "^3.2.9",
-    "babylonjs": "^5.10.0",
-    "babylonjs-gui": "^5.10.0",
-    "babylonjs-loaders": "^5.10.0",
-    "babylonjs-materials": "^5.10.0",
-    "babylonjs-serializers": "^5.10.0",
     "element-plus": "^2.2.8",
     "element-ui": "^2.15.9",
     "vue": "^3.2.25"

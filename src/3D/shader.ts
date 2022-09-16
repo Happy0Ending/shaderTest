@@ -1,4 +1,5 @@
-import { AbstractMesh, Color3, Effect, GizmoManager, Mesh, Scene, ShaderMaterial, Texture, Vector3 } from "babylonjs";
+
+import { AbstractMesh, Color3, Effect, Mesh, Scene, ShaderMaterial, Texture, Vector3 } from "@babylonjs/core";
 import Color from "element-plus/es/components/color-picker/src/color";
 
 

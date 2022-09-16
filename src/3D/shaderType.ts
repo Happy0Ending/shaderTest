@@ -1,4 +1,5 @@
-import { Color3, ShaderMaterial, Texture, Vector3 } from "babylonjs";
+import { ShaderMaterial, Vector3, Color3, Texture } from "@babylonjs/core";
+
 
 export interface Ishader{
     mat:ShaderMaterial,

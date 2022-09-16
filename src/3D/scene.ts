@@ -1,6 +1,7 @@
-import { AbstractMesh, ArcRotateCamera, Color3, Color4, Engine, GlowLayer, HemisphericLight, MeshBuilder, Scene, SceneLoader, Texture, Vector3 } from "babylonjs";
+
+import { AbstractMesh, ArcRotateCamera, Color3, Color4, Engine, GlowLayer, HemisphericLight, MeshBuilder, Scene, SceneLoader, Texture, Vector3 } from "@babylonjs/core";
 import { outLineAlphaByMesh } from "./shader";
-import 'babylonjs-loaders'
+import '@babylonjs/loaders'
 import { Ishader } from "./shaderType";
 import { setValue } from "./setValue";
 import { IEdges, IGlInfo, IshaderMatInfo } from "./IProperty";
@@ -15,18 +16,21 @@ import { boliScene } from "./scene/glassBoliScene";
 import { textureScene } from "./scene/textureScene";
 import { mapScene } from "./scene/mapScene";
 import { Breadcrumb } from "ant-design-vue";
+import { lineScene } from "./scene/lineScene";
+import { LineSysManager } from "./lineSystem/lineSystemManager";
 export class SceneManager {
     public engine: Engine;
     public activeScene: Scene;
     public matList: Ishader[];
     public gl: GlowLayer | null = null;
-    public glScene: Scene;
-    public gradientScene: Scene;
-    public wireFrameScene: Scene;
-    public pbrScene: Scene;
-    public reflectScene: Scene;
-    public glassScene: Scene;
-    public boliScene:Scene;
+    // public glScene: Scene;
+    // public gradientScene: Scene;
+    // public wireFrameScene: Scene;
+    // public pbrScene: Scene;
+    // public reflectScene: Scene;
+    // public glassScene: Scene;
+    // public boliScene:Scene;
+    public lineSysManager:LineSysManager;
     public mapScene:Scene;
     constructor(canvas: HTMLCanvasElement) {
         this.engine = new Engine(canvas);
@@ -39,11 +43,13 @@ export class SceneManager {
         // this.reflectScene = reflectScene(this.engine, canvas);
         // this.glassScene = glassScene(this.engine, canvas);
         // this.boliScene = boliScene(this.engine,canvas);
-        this.mapScene = mapScene(this.engine,canvas);
+
+        this.mapScene = lineScene(this.engine,canvas,this);
         this.activeScene = this.mapScene;
         this.engine.runRenderLoop(() => {
             this.activeScene.render();
         })
+        this.lineSysManager = new LineSysManager(this);
     }
     createScene(engine: Engine, canvas: HTMLCanvasElement) {
         let scene = new Scene(engine);
@@ -55,37 +61,7 @@ export class SceneManager {
         let light2 = new HemisphericLight('light', new Vector3(0, 100, 0), scene);
         let gl = new GlowLayer("gl", scene);
         gl.blurKernelSize = 32;
-        gl.intensity
         this.gl = gl;
-        SceneLoader.ImportMesh('', '', "2222.glb", scene, (meshes, an, bb, cc) => {
-            meshes.forEach((mesh) => {
-                if (mesh.name.includes("Shield")) {
-                    mesh.dispose();
-                }
-            })
-
-
-            meshes.forEach((mesh) => {
-                // mesh.enableEdgesRendering()
-                let color = Color3.FromHexString("#91f6fe");
-                mesh.enableEdgesRendering();
-                mesh.edgesColor = Color4.FromColor3(color, 1);
-                let shader = outLineAlphaByMesh(scene, mesh, color, 1);
-
-                const mat2 = shader.mat;
-                this.matList.push(shader);
-                mesh.material = mat2;
-                gl.referenceMeshToUseItsOwnMaterial(mesh);
-                // mesh instanceof Mesh &&hl.addMesh(mesh,Color3.FromHexString("#91f6fe"),true);
-            })
-        })
-        const box = MeshBuilder.CreateSphere("box", { diameter: 4 });
-        box.position.y = 10;
-        const mat1 = outLineAlphaByMesh(scene, box, Color3.FromHexString("#91f6fe"), 1);
-        box.material = mat1.mat;
-        this.matList.push(mat1);
-        this.gl.referenceMeshToUseItsOwnMaterial(box);
-
         // const box2 = MeshBuilder.CreateBox("Box2");
         // box2.position.z  += 8
         // box2.material = null;

@@ -1,4 +1,5 @@
-import { AbstractMesh, Color3, Color4, GlowLayer, ShaderMaterial } from "babylonjs";
+
+import { AbstractMesh, Color3, Color4, GlowLayer, ShaderMaterial } from "@babylonjs/core";
 import { object } from "vue-types";
 import { IOptions } from "./Ioptions";
 import { IEdges, IGlInfo, IshaderMatInfo } from "./IProperty";
