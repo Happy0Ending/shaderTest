@@ -14,15 +14,19 @@ onUnmounted(() => {
 </script>
 <template>
   <div id="parent">
+    <div id = "test">hello HelloWorld</div>
     <canvas id="renderCanvas"></canvas>
   </div>
 </template>
 <style scoped>
+#test{
+  font-family: quantum;
+}
 #renderCanvas {
   padding-left: 0;
   padding-top: 0;
   width: 100%;
-  height: 100%;
+  height: 90%;
 }
 
 .block {

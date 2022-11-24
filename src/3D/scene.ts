@@ -29,7 +29,7 @@ export class SceneManager {
     // public pbrScene: Scene;
     // public reflectScene: Scene;
     // public glassScene: Scene;
-    // public boliScene:Scene;
+    public boliScene:Scene;
     public lineSysManager:LineSysManager;
     public mapScene:Scene;
     constructor(canvas: HTMLCanvasElement) {
@@ -42,10 +42,9 @@ export class SceneManager {
         // this.pbrScene = pbrScene(this.engine, canvas);
         // this.reflectScene = reflectScene(this.engine, canvas);
         // this.glassScene = glassScene(this.engine, canvas);
-        // this.boliScene = boliScene(this.engine,canvas);
-
-        this.mapScene = lineScene(this.engine,canvas,this);
-        this.activeScene = this.mapScene;
+        this.boliScene = boliScene(this.engine,canvas);
+        this.mapScene = reflectScene(this.engine,canvas);
+        this.activeScene = this.boliScene;
         this.engine.runRenderLoop(() => {
             this.activeScene.render();
         })
