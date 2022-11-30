@@ -49,10 +49,10 @@
   resolved "https://registry.yarnpkg.com/@babylonjs/gui/-/gui-5.23.0.tgz#7418b0f657038aecf7b5a32b2adce23286338872"
   integrity sha512-oqoUZsN8FbcuCmd61Y64legYxqhYlqSB0qjbh7ZDn21o3JCj4fauUQ9yHQKDkKSOQUOvZzuB4hOgNvk9eS7iTw==
 
-"@babylonjs/inspector@^5.33.1":
-  version "5.33.1"
-  resolved "https://registry.yarnpkg.com/@babylonjs/inspector/-/inspector-5.33.1.tgz#58465a6f29e000764d81bb160c0f6da875d887df"
-  integrity sha512-PV51UnPCmYu+NAqD/HN6VXUo3GSnlMQBHNS/Y1ek0qNvfebBIRNJPYoYo2ezYDAgSQlvOz/Z6mmExmGNnwphow==
+"@babylonjs/inspector@^5.23.0":
+  version "5.34.0"
+  resolved "https://registry.yarnpkg.com/@babylonjs/inspector/-/inspector-5.34.0.tgz#36eaf3fe942493fd2a7ddd708899e57e205de842"
+  integrity sha512-dP8V59apsxpDMw8z8EHVCKgZGQAr9wyqOqLUC8SuJhjhuJ8V7WNl+NWnQifgtiS4h9iDdEsDjIwIqHnqFyP3Vw==
   dependencies:
     "@fortawesome/fontawesome-svg-core" "^6.1.0"
     "@fortawesome/free-regular-svg-icons" "^6.0.0"
