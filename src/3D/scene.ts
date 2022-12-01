@@ -18,6 +18,7 @@ import { mapScene } from "./scene/mapScene";
 import { Breadcrumb } from "ant-design-vue";
 import { lineScene } from "./scene/lineScene";
 import { LineSysManager } from "./lineSystem/lineSystemManager";
+import { ChartsManager } from "./scene/charts";
 export class SceneManager {
     public engine: Engine;
     public activeScene: Scene;
@@ -46,10 +47,12 @@ export class SceneManager {
         this.boliScene = lineScene(this.engine,canvas,this);
         this.mapScene = reflectScene(this.engine,canvas);
         this.activeScene = this.boliScene;
+
         this.engine.runRenderLoop(() => {
             this.activeScene.render();
         })
         this.lineSysManager = new LineSysManager(this);
+        let a = new ChartsManager(this);
     }
     createScene(engine: Engine, canvas: HTMLCanvasElement) {
         let scene = new Scene(engine);

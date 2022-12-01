@@ -46,9 +46,9 @@ export function lineScene(engine: Engine, canvas: HTMLCanvasElement, root: Scene
     box4.position.z = 20;
     const gizmo = new GizmoManager(scene);
     gizmo.positionGizmoEnabled = true;
-    gizmo.gizmos.positionGizmo?.onDragEndObservable.add(()=>{
-        root.lineSysManager.updataLines();
-    })
+    // gizmo.gizmos.positionGizmo?.onDragEndObservable.add(()=>{
+    //     root.lineSysManager.updataLines();
+    // })
     // scene.onPointerDown = (e,p)=>{
     //     if(p.hit){
     //         gizmo.attachToNode(p.pickedMesh);
