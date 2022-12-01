@@ -1,5 +1,4 @@
-import { AbstractMesh, Color3, Effect, Mesh, Scene, ShaderMaterial, Vector3 } from "@babylonjs/core";
-import { Color3LineComponent } from "@babylonjs/node-editor/lines/color3LineComponent";
+import { AbstractMesh, Color3, Effect, Material, Mesh, Scene, ShaderMaterial, Vector3 } from "@babylonjs/core";
 import { setValueGlowLayer } from "../setValue";
 
 export function createShaderMaterial(mesh: AbstractMesh, scene: Scene) {
@@ -118,31 +117,42 @@ export function createShaderMaterial(mesh: AbstractMesh, scene: Scene) {
     mat.setFloat("timeScale2",timeScale2);
     mat.setFloat("timeScale3",timeScale3);
     
-    scene.onBeforeRenderObservable.add(()=>{
-        console.log(tTime)
-        if(tTime<2000){
-            tTime+=5;
-            mat.setFloat("tTime",tTime);
+    const obseralbe= scene.onBeforeRenderObservable.add(()=>{
+        if( mat.getBindedMeshes().length>0){
+            // console.log("正在启动",mat.meshMap)
+            if(tTime<2000){
+                tTime+=5;
+                mat.setFloat("tTime",tTime);
+            }else{
+                tTime = -1000;
+                mat.setFloat("tTime",tTime);
+            }
+            if(tTime2<2000){
+                tTime2+=10;
+                mat.setFloat("tTime2",tTime2);
+            }else{
+                tTime2 = -200;
+                mat.setFloat("tTime2",tTime2);
+            }
+            if(tTime3<300){
+                tTime3+=1;
+                mat.setFloat("tTime3",tTime3);
+            }else{
+                tTime3 = 0;
+                mat.setFloat("tTime3",tTime3);
+            }
         }else{
-            tTime = -1000;
-            mat.setFloat("tTime",tTime);
-        }
-        if(tTime2<2000){
-            tTime2+=10;
-            mat.setFloat("tTime2",tTime2);
-        }else{
-            tTime2 = -200;
-            mat.setFloat("tTime2",tTime2);
-        }
-        if(tTime3<300){
-            tTime3+=1;
-            mat.setFloat("tTime3",tTime3);
-        }else{
-            tTime3 = 0;
-            mat.setFloat("tTime3",tTime3);
+            console.log("清除")
+            scene.onBeforeRenderObservable.remove(obseralbe)
         }
     })
-   
+    mat.onEffectCreatedObservable.add(()=>{
+        console.log("bind")
+    })
+    
+    // mat.pointsCloud = true;
+    // mat.
+    
     return mat
 }
 

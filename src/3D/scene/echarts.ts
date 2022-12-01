@@ -21,11 +21,8 @@ export function lineScene(engine: Engine, canvas: HTMLCanvasElement, root: Scene
     let light2 = new HemisphericLight('light', new Vector3(0, 100, 0), scene);
     scene.clearColor = Color3.FromHexString("#e5e5e5").toColor4();
     var groundMaterial = new StandardMaterial("groundMaterial", scene);
-    let texture =  new Texture("xuanwo.png", scene);
-	groundMaterial.diffuseTexture =texture;
-    setTimeout(() => {
-        texture.uScale +=0.01;
-    }, 30);
+	groundMaterial.diffuseTexture = new Texture("xuanwo.png", scene);
+
 	var ground = Mesh.CreateGround("ground", 512, 512, 32, scene, false);
 	ground.position.y = -1;
 	ground.material = groundMaterial;

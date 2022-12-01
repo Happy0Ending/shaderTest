@@ -42,7 +42,8 @@ export class SceneManager {
         // this.pbrScene = pbrScene(this.engine, canvas);
         // this.reflectScene = reflectScene(this.engine, canvas);
         // this.glassScene = glassScene(this.engine, canvas);
-        this.boliScene = boliScene(this.engine,canvas);
+        
+        this.boliScene = lineScene(this.engine,canvas,this);
         this.mapScene = reflectScene(this.engine,canvas);
         this.activeScene = this.boliScene;
         this.engine.runRenderLoop(() => {
