@@ -9,21 +9,36 @@
 </head>
 
 <body>
-    
+
     <script>
         const input = document.createElement('input');
         input.type = "file";
-        input.addEventListener('change', function() {
-                if(this.files.length){
-                    let file = this.files[0];
-                    file.text().then((string)=>{
+        console.time("read")
+        input.addEventListener('change', function () {
+            if (this.files.length) {
+                let file = this.files[0];
+                console.log(file);
+                file.text().then((s) => {
+                    console.log(s);
 
-                        console.log(string);
-                    })
-                }
-            }, false);
+                    function encode(str) {
+                        // 对字符串进行编码
+                        var encode = encodeURI(str);
+                        // 对编码的字符串转化base64
+                        var base64 = btoa(encode);
+                        return base64;
+                    }
+                    console.time("aa")
+                    let ss = encode(s);
+                    console.timeEnd("aa")
+                    console.log("base64",ss)
+                    
+                    // s.replace("rota")
+                })
+            }
+        }, false);
         document.body.appendChild(input)
-        
+
     </script>
 </body>
 

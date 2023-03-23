@@ -1,5 +1,5 @@
 
-import { AbstractMesh, ArcRotateCamera, Color3, Color4, Engine, GlowLayer, HemisphericLight, MeshBuilder, Scene, SceneLoader, Texture, Vector3 } from "@babylonjs/core";
+import { AbstractMesh, ArcRotateCamera, Color3, Color4, Engine, GlowLayer, HemisphericLight, HtmlElementTexture, MeshBuilder, PBRMaterial, Scene, SceneLoader, Texture, Vector3 } from "@babylonjs/core";
 import { outLineAlphaByMesh } from "./shader";
 import '@babylonjs/loaders'
 import { Ishader } from "./shaderType";
@@ -19,6 +19,13 @@ import { Breadcrumb } from "ant-design-vue";
 import { lineScene } from "./scene/lineScene";
 import { LineSysManager } from "./lineSystem/lineSystemManager";
 import { ChartsManager } from "./scene/charts";
+import { prefabScene } from "./scene/prefabScene";
+import { CubeTexture } from "@babylonjs/core/Materials/Textures/cubeTexture";
+import { Plane } from "@babylonjs/core/Maths/math.plane";
+import { PBRBaseMaterial } from "@babylonjs/core/Materials/PBR/pbrBaseMaterial";
+import { createCharts } from "./echarts";
+import axios from "axios";
+import { createHtmlMesh } from "./CSS3dRender";
 export class SceneManager {
     public engine: Engine;
     public activeScene: Scene;
@@ -30,9 +37,9 @@ export class SceneManager {
     // public pbrScene: Scene;
     // public reflectScene: Scene;
     // public glassScene: Scene;
-    public boliScene:Scene;
-    public lineSysManager:LineSysManager;
-    public mapScene:Scene;
+    public boliScene: Scene;
+    public lineSysManager: LineSysManager;
+    public mapScene: Scene;
     constructor(canvas: HTMLCanvasElement) {
         this.engine = new Engine(canvas);
         this.matList = [];
@@ -43,16 +50,16 @@ export class SceneManager {
         // this.pbrScene = pbrScene(this.engine, canvas);
         // this.reflectScene = reflectScene(this.engine, canvas);
         // this.glassScene = glassScene(this.engine, canvas);
-        
-        this.boliScene = lineScene(this.engine,canvas,this);
-        this.mapScene = reflectScene(this.engine,canvas);
-        this.activeScene = this.boliScene;
+
+        this.boliScene = prefabScene(this.engine, canvas);
+        // this.mapScene = reflectScene(this.engine,canvas);
+        this.activeScene = this.createScene(this.engine, canvas);
 
         this.engine.runRenderLoop(() => {
             this.activeScene.render();
         })
-        this.lineSysManager = new LineSysManager(this);
-        let a = new ChartsManager(this);
+        // this.lineSysManager = new LineSysManager(this);
+        // let a = new ChartsManager(this);
     }
     createScene(engine: Engine, canvas: HTMLCanvasElement) {
         let scene = new Scene(engine);
@@ -61,42 +68,67 @@ export class SceneManager {
             Vector3.Zero(), scene);
         camera.attachControl(canvas);
         let light = new HemisphericLight('light', new Vector3(0, -100, 0), scene);
-        let light2 = new HemisphericLight('light', new Vector3(0, 100, 0), scene);
-        let gl = new GlowLayer("gl", scene);
-        gl.blurKernelSize = 32;
-        this.gl = gl;
-        // const box2 = MeshBuilder.CreateBox("Box2");
-        // box2.position.z  += 8
-        // box2.material = null;
-        // const mat  = gradientMat(scene,box2);
-        // box2.material = mat;
-        // box2.enableEdgesRendering();
-        // box2.edgesColor = Color4.FromHexString("#2c59a0");
-        // box2.edgesWidth = 2;
-        // const sphere = MeshBuilder.CreateSphere("sphere");
-        // // const mat2 = outLineAlphaByMesh(scene, sphere, Color3.FromHexString("#91f6fe"), 1);
-        // sphere.material = mat;
-        // // this.matList.push(mat2);
-        // sphere.position.z = 20;
+        scene.environmentTexture = CubeTexture.CreateFromPrefilteredData("country.env", scene);
+        const plane = MeshBuilder.CreatePlane("plane", { size: 1 }, scene);
+        const plane2 = MeshBuilder.CreatePlane("plane", { size: 16 }, scene);
+        plane2.position.z = 16;
+
+        plane.visibility = 1;
+        const mat = new PBRMaterial("mat", scene);
+        mat.metallic = 0;
+        mat.roughness = 1.0;
+        mat.albedoColor = Color3.White();
+        plane.material = mat;
 
 
-        // scene.debugLayer.show();
-        // scene.onPointerDown = () => {
-        //     result = scene.pick(scene.pointerX, scene.pointerY, (mesh => !mesh.name.includes("root")));
-        //     if (result?.pickedMesh) {
-        //         console.log(result?.pickedMesh.name)
-        //     }
-        // }
-        // let box = MeshBuilder.CreatePlane("box",{size:10});
-        // let box2 = MeshBuilder.CreatePlane("box",{size:10});
-        // box2.position.x +=5;
-        // createHtmlMesh(box,this.engine.getRenderingCanvas() as HTMLCanvasElement,"https://www.huya.com");
-        // setTimeout(() => {
-        //     // createHtmlMesh(box2,this.engine.getRenderingCanvas() as HTMLCanvasElement,"https://www.huya.com");
-        // }, 3000);
+        const mat2 = new PBRMaterial("mat", scene);
+        mat2.metallic = 0;
+        mat2.roughness = 1.0;
+        mat2.albedoColor = Color3.Blue();
+        plane2.material = mat2;
+
+        var chartDom = document.getElementById('charts') as HTMLCanvasElement;
+        axios.get("table.json").then((value) => {
+            createCharts(chartDom, value.data);
+            // const texture = new HtmlElementTexture("123", chartDom.children[0].children[0] as HTMLCanvasElement,
+            //     {
+            //         engine: this.engine, scene: scene,
+            //         generateMipMaps: true,
+            //     }
+            // );
+            // mat.albedoTexture = texture;
+            // console.time("aa");
+            const domCanvas = chartDom.children[0].children[0] as HTMLCanvasElement;
+            createHtmlMesh(plane,canvas,domCanvas)
+            // let string1 = domCanvas.toDataURL();
+            // let file1 = this.base64ImgtoFile(string1);
+            // let imageURL = window.webkitURL.createObjectURL(file1) || window.URL.createObjectURL(file1);
+            // let texture2 = new Texture(imageURL, scene);
+        
+            // mat2.albedoTexture = texture2;
+            scene.onAfterRenderObservable.add(() => {
+                // texture.update();
+            })
+        })
+
+        // mat.albedoTextur
+
         return scene
     }
-
+    base64ImgtoFile(dataurl: any, filename = 'file') {
+        const arr = dataurl.split(',')
+        const mime = arr[0].match(/:(.*?);/)[1]
+        const suffix = mime.split('/')[1]
+        const bstr = atob(arr[1])
+        let n = bstr.length
+        const u8arr = new Uint8Array(n)
+        while (n--) {
+            u8arr[n] = bstr.charCodeAt(n)
+        }
+        return new File([u8arr], `${filename}.${suffix}`, {
+            type: mime
+        })
+    }
     getBoundingBoxInfo(nodes: AbstractMesh[]) {
         let min: Vector3 = Vector3.Zero();
         let max: Vector3 = Vector3.Zero();
@@ -161,33 +193,7 @@ export class SceneManager {
         return window.btoa(str);
     }
 
-    selectScene(type: SceneType) {
-        switch (type) {
-            case SceneType.glScene:
-                this.activeScene = this.glScene
-                break;
-            case SceneType.grientScene:
-                this.activeScene = this.gradientScene
-                break;
-            case SceneType.wireFrameScene:
-                this.activeScene = this.wireFrameScene;
-                break;
-            case SceneType.pbrScene:
-                this.activeScene = this.pbrScene;
-                break;
-            case SceneType.reflectScene:
-                this.activeScene = this.reflectScene;
-                break;
-            case SceneType.glassScene:
-                this.activeScene = this.glassScene;
-            case SceneType.boliScene:
-                this.activeScene = this.boliScene;
-                break;
-            case SceneType.MapScene:
-                this.activeScene = this.mapScene
-                break;
-        }
-    }
+
     /**
  * uint8array转Base64
  * @param callback Function 获取转换结果e.target.result后执行的回调函数
