@@ -8,8 +8,8 @@ import SceneSelect from "./components/SceneSelect.vue";
 
 <template>
   <HelloWorld />
-  <MeshEdges/>
-  <SceneSelect/>
+  <!-- <MeshEdges/> -->
+  <!-- <SceneSelect/> -->
 </template>
 
 <style>

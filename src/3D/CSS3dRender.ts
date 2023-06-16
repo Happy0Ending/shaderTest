@@ -207,28 +207,6 @@ class CSS3DObject extends Mesh {
         this.element.style.pointerEvents = 'auto'
         this.name = name;
         this.element.style.pointerEvents = "none";
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
         this.onDispose = () => {
             this.topParent?.remove();
         }
@@ -258,20 +236,17 @@ export function setupRenderer(canvas: HTMLCanvasElement) {
     return renderer
 }
 
-export function createCSSobject(mesh: Mesh, scene: Scene, canvasDiv: HTMLElement) {
-    // let width = 1920;
-    // let height = 1080;
-    
-
+export function createCSSobject(mesh: Mesh, scene: Scene, canvasDiv: HTMLElement, width?: number, height?: number) {
+    let widthDiv = width ? width + "px" : canvasDiv.style.width;
+    let heightDiv = height ? height + "px" : canvasDiv.style.height;
     var div = document.createElement('div');
     div.style.pointerEvents = "none";
-    div.style.width = canvasDiv.style.width;
-    div.style.height = canvasDiv.style.height;
+    div.style.width = widthDiv;
+    div.style.height = heightDiv;
     var CSSobject = new CSS3DObject(div, "box", scene)
-    CSSobject.position.copyFrom(mesh.getAbsolutePosition())
+    CSSobject.position.copyFrom(mesh.getBoundingInfo().boundingBox.vectorsWorld[6]);
     CSSobject.rotation.y = -mesh.rotation.y
     CSSobject.scaling.copyFrom(mesh.scaling)
-
     // var iframe = document.createElement('iframe')
     // // iframe.id = 'video-' + videoID
     // iframe.style.width = width + 'px'

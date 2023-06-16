@@ -1,5 +1,5 @@
 
-import { AbstractMesh, ArcRotateCamera, Color3, Color4, Engine, GlowLayer, HemisphericLight, HtmlElementTexture, MeshBuilder, PBRMaterial, Scene, SceneLoader, Texture, Vector3 } from "@babylonjs/core";
+import { AbstractMesh, ArcRotateCamera, Color3, Color4, Engine, GlowLayer, HemisphericLight, HtmlElementTexture, MeshBuilder, PBRMaterial, Scene, SceneLoader, Space, Texture, Vector3 } from "@babylonjs/core";
 import { outLineAlphaByMesh } from "./shader";
 import '@babylonjs/loaders'
 import { Ishader } from "./shaderType";
@@ -26,6 +26,9 @@ import { PBRBaseMaterial } from "@babylonjs/core/Materials/PBR/pbrBaseMaterial";
 import { createCharts } from "./echarts";
 import axios from "axios";
 import { createHtmlMesh } from "./CSS3dRender";
+import { createCharts2 } from "./charts/charts2";
+import { createCharts3 } from "./charts/charts3";
+import { createCharts4 } from "./charts/charts4";
 export class SceneManager {
     public engine: Engine;
     public activeScene: Scene;
@@ -51,9 +54,9 @@ export class SceneManager {
         // this.reflectScene = reflectScene(this.engine, canvas);
         // this.glassScene = glassScene(this.engine, canvas);
 
-        this.boliScene = prefabScene(this.engine, canvas);
+        this.boliScene = boliScene(this.engine, canvas);
         // this.mapScene = reflectScene(this.engine,canvas);
-        this.activeScene = this.createScene(this.engine, canvas);
+        this.activeScene = this.boliScene;
 
         this.engine.runRenderLoop(() => {
             this.activeScene.render();
@@ -69,7 +72,7 @@ export class SceneManager {
         camera.attachControl(canvas);
         let light = new HemisphericLight('light', new Vector3(0, -100, 0), scene);
         scene.environmentTexture = CubeTexture.CreateFromPrefilteredData("country.env", scene);
-        const plane = MeshBuilder.CreatePlane("plane", { size: 1 }, scene);
+        const plane = MeshBuilder.CreatePlane("plane", { size: 16 }, scene);
         const plane2 = MeshBuilder.CreatePlane("plane", { size: 16 }, scene);
         plane2.position.z = 16;
 
@@ -79,7 +82,7 @@ export class SceneManager {
         mat.roughness = 1.0;
         mat.albedoColor = Color3.White();
         plane.material = mat;
-
+        this.initChartsPlane(plane)
 
         const mat2 = new PBRMaterial("mat", scene);
         mat2.metallic = 0;
@@ -87,33 +90,33 @@ export class SceneManager {
         mat2.albedoColor = Color3.Blue();
         plane2.material = mat2;
 
-        var chartDom = document.getElementById('charts') as HTMLCanvasElement;
-        axios.get("table.json").then((value) => {
-            createCharts(chartDom, value.data);
-            // const texture = new HtmlElementTexture("123", chartDom.children[0].children[0] as HTMLCanvasElement,
-            //     {
-            //         engine: this.engine, scene: scene,
-            //         generateMipMaps: true,
-            //     }
-            // );
-            // mat.albedoTexture = texture;
-            // console.time("aa");
-            const domCanvas = chartDom.children[0].children[0] as HTMLCanvasElement;
-            createHtmlMesh(plane,canvas,domCanvas)
-            // let string1 = domCanvas.toDataURL();
-            // let file1 = this.base64ImgtoFile(string1);
-            // let imageURL = window.webkitURL.createObjectURL(file1) || window.URL.createObjectURL(file1);
-            // let texture2 = new Texture(imageURL, scene);
-        
-            // mat2.albedoTexture = texture2;
-            scene.onAfterRenderObservable.add(() => {
-                // texture.update();
-            })
-        })
+        var chartDom = document.getElementById('charts1') as HTMLCanvasElement;
+        createCharts2();
+        createCharts3();
+        createCharts4();
+        // createCharts5()
+        const domCanvas = document.getElementById("chartsDiv");
+        if (domCanvas) {
+           const a =  createHtmlMesh(plane, canvas, domCanvas);
+           window.a =a ;
+        }
+        // const domCanvas2 = document.getElementById("charts3");
+        // if (domCanvas2) {
+        //     createHtmlMesh(plane2, canvas, domCanvas2);
+        // }
 
+        // createHtmlMesh(plane,canvas,domCanvas)
+        // let string1 = domCanvas.toDataURL();
+        // let file1 = this.base64ImgtoFile(string1);
+        // let imageURL = window.webkitURL.createObjectURL(file1) || window.URL.createObjectURL(file1);
+        // let texture2 = new Texture(imageURL, scene);
         // mat.albedoTextur
 
         return scene
+    }
+    initChartsPlane(plane:AbstractMesh){
+        const pivot = plane.getBoundingInfo().boundingBox.vectorsWorld[6];
+        plane.setPivotPoint(pivot,Space.WORLD);
     }
     base64ImgtoFile(dataurl: any, filename = 'file') {
         const arr = dataurl.split(',')

@@ -14,32 +14,90 @@ onUnmounted(() => {
 </script>
 <template>
   <div id="parent">
-    <div id = "test">hello HelloWorld</div>
+
     <canvas id="renderCanvas"></canvas>
+    <!-- <div id="chartsDiv">
+      <div id="chartsDDiv ">
+        <div id="charts1"></div>
+        <div id="charts2"></div>
+        <div id="charts3"></div>
+        <div id="charts4"></div>
+        <div id="charts5"></div>
+      </div>
+    </div> -->
   </div>
-  <div id="charts">
-   
-  </div>
-  
 </template>
 <style scoped>
-#test{
+#test {
   font-family: quantum;
 }
+
+#parent {
+  padding-left: 0;
+  padding-top: 0;
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
 #renderCanvas {
   padding-left: 0;
   padding-top: 0;
   width: 100%;
   height: 100%;
 }
-#charts{
-  /* position: absolute;
-  top: 50%;
+
+#chartsDiv {
+  pointer-events: none;
+  width: 100%;
+  height: 100%;
   padding-left: 0;
   padding-top: 0;
-  width: 50%;
-  height: 50%;
-  background-color: aqua; */
+  position: absolute;
+  top: 0%;
+  left: 0%;
+  z-index: 500;
+  background-image: url("floor.png");
+  /* background-color: aqua; */
+}
+
+#chartsDDiv {
+  pointer-events: none;
+  width: 100%;
+  height: 100%;
+  padding-left: 0;
+  padding-top: 0;
+  position: relative;
+  background-color: aqua;
+}
+
+#charts1 {
+  position: absolute;
+  top: 0%;
+  left: 50%;
+  width: 500px;
+  height: 500px;
+  background-color: rgb(41, 210, 15);
+}
+
+#charts2 {
+  width: 500px;
+  height: 500px;
+}
+
+#charts3 {
+  width: 500px;
+  height: 500px;
+}
+
+#charts4 {
+  width: 500px;
+  height: 500px;
+}
+
+#charts5 {
+  width: 500px;
+  height: 500px;
 }
 
 .block {
