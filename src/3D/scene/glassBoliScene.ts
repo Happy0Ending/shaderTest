@@ -40,7 +40,13 @@ export function boliScene(engine: Engine, canvas: HTMLCanvasElement) {
         LEFT = 1,
         BACK = 2,
         RIGHT = 3,
-        STOP = 4,
+        stop = 4,
+    }
+    const RUNFLAG = {
+        FORWARD: false,
+        LEFT: false,
+        BACK: false,
+        RIGHT: false,
     }
 
     SceneLoader.LoadAssetContainer("/", "wr.glb", scene, (container) => {
@@ -50,27 +56,52 @@ export function boliScene(engine: Engine, canvas: HTMLCanvasElement) {
         container.meshes[0].scaling.scaleInPlace(3);
         root.rotationQuaternion = null;
         // root.rotation = new Vector3(0,-Math.PI,0);
-        window.root = root;
         let followCamera = new ArcRotateCamera("follow", Math.PI / 2, 0, 10, root.position, scene);
         followCamera.attachControl();
 
-        let walk = scene.animationGroups;
-        console.log(walk);
+        followCamera.lowerRadiusLimit = 20;
+        followCamera.upperRadiusLimit = 50;
+        followCamera.upperBetaLimit = Math.PI/2;
+        followCamera.lowerBetaLimit = Math.PI/3
+        followCamera.targetHost = root;
         let runFlag = 4;
-        const setTransform = (type: string, directionStr: Directioin) => {
+        const setTransform = (type: string, directionStr: Directioin, runStr: string) => {
             if (type == "keydown") {
+                scene.animationGroups[0].stop();
                 if (!scene.animationGroups[1].isPlaying) {
-                    scene.animationGroups[0].stop();
-                    scene.animationGroups[1].start();
-                    runFlag = directionStr;
-                    let rayDir = Vector3.Normalize(Vector3.FromArray([followCamera.getForwardRay().direction.x, 0, followCamera.getForwardRay().direction.z]));
-                    root.lookAt(root.position.add(rayDir.scale(-1)));
-                    root.rotate(new Vector3(0, 1, 0), directionStr * Math.PI * -0.5)
+                    scene.animationGroups[1].start(true);
                 }
+                runFlag = directionStr;
+                let rayDir = Vector3.Normalize(Vector3.FromArray([followCamera.getForwardRay().direction.x, 0, followCamera.getForwardRay().direction.z]));
+                root.lookAt(root.position.add(rayDir.scale(-1)));
+                root.rotate(new Vector3(0, 1, 0), directionStr * Math.PI * -0.5);
             } else {
-                scene.animationGroups[1].stop();
-                scene.animationGroups[0].start();
-                runFlag = Directioin.STOP;
+                let flag: boolean = RUNFLAG.FORWARD || RUNFLAG.LEFT || RUNFLAG.RIGHT || RUNFLAG.BACK;
+                // console.log("是否停止动画", flag)
+                if (!flag) {
+                    scene.animationGroups[1].stop();
+                    scene.animationGroups[0].start();
+                    runFlag = 4;
+                }
+            }
+        }
+
+        const setFlag = (type: string, directionStr: string) => {
+            if (type == "keydown") {
+                (<any>RUNFLAG)[directionStr] = true;
+                // Object.keys(RUNFLAG).filter(str => str!=directionStr).forEach((str)=>{
+                //     (<any>RUNFLAG)[str] = false;
+                // })
+            } else {
+                (<any>RUNFLAG)[directionStr] = false;
+                if(directionStr == "LEFT"||directionStr == "RIGHT"){
+                    if(RUNFLAG.FORWARD){
+                        setTransform("keydown", Directioin.FORWARD, "FORWARD");
+                    }
+                    if(RUNFLAG.BACK){
+                        setTransform("keydown", Directioin.BACK, "BACK");
+                    }
+                }
             }
         }
 
@@ -79,10 +110,10 @@ export function boliScene(engine: Engine, canvas: HTMLCanvasElement) {
             // console.log("eventState",es)
             if (e.event.code) {
                 switch (e.event.code) {
-                    case "KeyW": setTransform(e.event.type, Directioin.FORWARD); break;
-                    case "KeyA": setTransform(e.event.type, Directioin.LEFT); break;
-                    case "KeyS": setTransform(e.event.type, Directioin.BACK); break;
-                    case "KeyD": setTransform(e.event.type, Directioin.RIGHT); break;
+                    case "KeyW": setFlag(e.event.type, "FORWARD"); setTransform(e.event.type, Directioin.FORWARD, "FORWARD"); break;
+                    case "KeyA": setFlag(e.event.type, "LEFT"); setTransform(e.event.type, Directioin.LEFT, "LEFT"); break;
+                    case "KeyS": setFlag(e.event.type, "BACK"); setTransform(e.event.type, Directioin.BACK, "BACK"); break;
+                    case "KeyD": setFlag(e.event.type, "RIGHT"); setTransform(e.event.type, Directioin.RIGHT, "RIGHT"); break;
                 }
             }
         })
@@ -100,7 +131,6 @@ export function boliScene(engine: Engine, canvas: HTMLCanvasElement) {
                 case Directioin.RIGHT:
                     root.position.addInPlace(Vector3.FromArray([followCamera.getForwardRay().direction.z, 0, -followCamera.getForwardRay().direction.x]).scale(0.2));
                     break;
-
                 default:
                     break;
             }
