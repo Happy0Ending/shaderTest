@@ -29,6 +29,7 @@ import { createHtmlMesh } from "./CSS3dRender";
 import { createCharts2 } from "./charts/charts2";
 import { createCharts3 } from "./charts/charts3";
 import { createCharts4 } from "./charts/charts4";
+import { ppScene } from "./scene/perferance";
 export class SceneManager {
     public engine: Engine;
     public activeScene: Scene;
@@ -54,7 +55,7 @@ export class SceneManager {
         // this.reflectScene = reflectScene(this.engine, canvas);
         // this.glassScene = glassScene(this.engine, canvas);
 
-        this.boliScene = boliScene(this.engine, canvas);
+        this.boliScene = ppScene(this.engine, canvas);
         // this.mapScene = reflectScene(this.engine,canvas);
         this.activeScene = this.boliScene;
 
