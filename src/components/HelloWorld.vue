@@ -25,6 +25,12 @@ onUnmounted(() => {
         <div id="charts5"></div>
       </div>
     </div> -->
+    <!-- <div id = "mapDivParent">
+
+      <div id = "mapDiv">
+    </div>
+
+    </div> -->
   </div>
 </template>
 <style scoped>
@@ -57,8 +63,23 @@ onUnmounted(() => {
   top: 0%;
   left: 0%;
   z-index: 500;
-  background-image: url("floor.png");
   /* background-color: aqua; */
+}
+
+#mapDivParent{
+  pointer-events: none;
+  width: 1000px;
+  height: 1000px;
+  padding-left: 0;
+  padding-top: 0;
+  position: absolute;
+  top: 0%;
+  left: 0%;
+  z-index: 500;
+}
+#mapDiv{
+  width: 1000px;
+  height:1000px ;
 }
 
 #chartsDDiv {

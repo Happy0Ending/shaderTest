@@ -1,5 +1,5 @@
 
-import { AbstractMesh, ArcRotateCamera, Color3, Color4, Engine, GlowLayer, HemisphericLight, HtmlElementTexture, MeshBuilder, PBRMaterial, Scene, SceneLoader, Space, Texture, Vector3 } from "@babylonjs/core";
+import { AbstractMesh, ArcRotateCamera, Color3, Color4, Engine, GizmoManager, GlowLayer, HemisphericLight, HtmlElementTexture, MeshBuilder, PBRMaterial, Scene, SceneLoader, Space, Texture, Vector3 } from "@babylonjs/core";
 import { outLineAlphaByMesh } from "./shader";
 import '@babylonjs/loaders'
 import { Ishader } from "./shaderType";
@@ -30,6 +30,11 @@ import { createCharts2 } from "./charts/charts2";
 import { createCharts3 } from "./charts/charts3";
 import { createCharts4 } from "./charts/charts4";
 import { ppScene } from "./scene/perferance";
+import { Map, View } from 'ol';
+import TileLayer from 'ol/layer/Tile';
+import * as olProj from "ol/proj";
+import XYZ from 'ol/source/XYZ';
+import { tileScene } from "./scene/tileScene";
 export class SceneManager {
     public engine: Engine;
     public activeScene: Scene;
@@ -42,8 +47,7 @@ export class SceneManager {
     // public reflectScene: Scene;
     // public glassScene: Scene;
     public boliScene: Scene;
-    public lineSysManager: LineSysManager;
-    public mapScene: Scene;
+  
     constructor(canvas: HTMLCanvasElement) {
         this.engine = new Engine(canvas);
         this.matList = [];
@@ -55,9 +59,9 @@ export class SceneManager {
         // this.reflectScene = reflectScene(this.engine, canvas);
         // this.glassScene = glassScene(this.engine, canvas);
 
-        this.boliScene = ppScene(this.engine, canvas);
+        // this.boliScene = ppScene(this.engine, canvas);
         // this.mapScene = reflectScene(this.engine,canvas);
-        this.activeScene = this.boliScene;
+        this.activeScene = tileScene(this.engine, canvas);
 
         this.engine.runRenderLoop(() => {
             this.activeScene.render();
@@ -73,11 +77,12 @@ export class SceneManager {
         camera.attachControl(canvas);
         let light = new HemisphericLight('light', new Vector3(0, -100, 0), scene);
         scene.environmentTexture = CubeTexture.CreateFromPrefilteredData("country.env", scene);
-        const plane = MeshBuilder.CreatePlane("plane", { size: 16 }, scene);
+        const plane = MeshBuilder.CreatePlane("plane", { size: 1 }, scene);
         const plane2 = MeshBuilder.CreatePlane("plane", { size: 16 }, scene);
         plane2.position.z = 16;
 
-        plane.visibility = 1;
+        plane.visibility = 0.2;
+        plane.rotation.x = Math.PI/2
         const mat = new PBRMaterial("mat", scene);
         mat.metallic = 0;
         mat.roughness = 1.0;
@@ -91,16 +96,45 @@ export class SceneManager {
         mat2.albedoColor = Color3.Blue();
         plane2.material = mat2;
 
-        var chartDom = document.getElementById('charts1') as HTMLCanvasElement;
-        createCharts2();
-        createCharts3();
-        createCharts4();
+        // var chartDom = document.getElementById('charts1') as HTMLCanvasElement;
+        // createCharts2();
+        // createCharts3();
+        // createCharts4();
         // createCharts5()
         const domCanvas = document.getElementById("chartsDiv");
         if (domCanvas) {
-           const a =  createHtmlMesh(plane, canvas, domCanvas);
-           window.a =a ;
+            // const a = createHtmlMesh(plane, canvas, domCanvas);
+            // window.a = a;
         }
+        new Map({
+            target: 'mapDiv',
+            layers: [
+                new TileLayer({
+                    source: new XYZ({
+                        url: 'https://wprd0{1-4}.is.autonavi.com/appmaptile?lang=zh_cn&size=1&style=7&x={x}&y={y}&z={z}',
+                    }),
+                }),
+            ],
+            view: new View({
+                // 将西安作为地图中心
+                center: olProj.fromLonLat([108.945951, 34.465262]),
+                zoom: 10,
+            }),
+            controls: [],
+        });
+        const domMap = document.getElementById("mapDivParent");
+        const gizmo = new GizmoManager(scene);
+        gizmo.rotationGizmoEnabled = true;
+        if (domMap) {
+            const b = createHtmlMesh(plane, canvas, domMap);
+            // b.scaling.x = 500;
+            // b.scaling.y = 500;
+            // b.scaling.z = 500;
+            // window.b = b;
+            // b.rotate(new Vector3(1,0,0),Math.PI/2);
+            
+        }
+
         // const domCanvas2 = document.getElementById("charts3");
         // if (domCanvas2) {
         //     createHtmlMesh(plane2, canvas, domCanvas2);
@@ -115,9 +149,9 @@ export class SceneManager {
 
         return scene
     }
-    initChartsPlane(plane:AbstractMesh){
-        const pivot = plane.getBoundingInfo().boundingBox.vectorsWorld[6];
-        plane.setPivotPoint(pivot,Space.WORLD);
+    initChartsPlane(plane: AbstractMesh) {
+        // const pivot = plane.getBoundingInfo().boundingBox.vectorsWorld[6];
+        // plane.setPivotPoint(pivot, Space.WORLD);
     }
     base64ImgtoFile(dataurl: any, filename = 'file') {
         const arr = dataurl.split(',')

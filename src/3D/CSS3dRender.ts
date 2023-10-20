@@ -245,7 +245,7 @@ export function createCSSobject(mesh: Mesh, scene: Scene, canvasDiv: HTMLElement
     div.style.height = heightDiv;
     var CSSobject = new CSS3DObject(div, "box", scene)
     CSSobject.position.copyFrom(mesh.getBoundingInfo().boundingBox.vectorsWorld[6]);
-    CSSobject.rotation.y = -mesh.rotation.y
+    CSSobject.rotation.y = mesh.rotation.y
     CSSobject.scaling.copyFrom(mesh.scaling)
     // var iframe = document.createElement('iframe')
     // // iframe.id = 'video-' + videoID
