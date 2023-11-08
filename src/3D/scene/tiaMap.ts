@@ -7,6 +7,7 @@ export function createTianMap(engine: Engine, canvas: HTMLCanvasElement) {
 
   // Create a rotating camera
   var camera = new ArcRotateCamera("Camera", 4.8, 0.5, 100, Vector3.Zero(), scene);
+  camera.wheelDeltaPercentage = 0.1;
   window.scene = scene;
   // Attach it to handle user inputs (keyboard, mouse, touch)
   camera.attachControl(canvas, false);
@@ -22,14 +23,20 @@ export function createTianMap(engine: Engine, canvas: HTMLCanvasElement) {
     ], colors: [Color3.Red().toColor4(), Color3.Red().toColor4()]
   })
   xAixs.renderingGroupId = 2;
+  scene.onPointerDown = (e, p) => {
+    if (p.hit) {
+      console.log(p.pickedPoint);
+    }
+  }
+  const box = MeshBuilder.CreateSphere("123", { diameter: 10 }, scene);
+  box.position = new Vector3(-640, 50, 320);
+  // let gizmo = new GizmoManager(scene);
+  // gizmo.positionGizmoEnabled = true;
 
-
-  let gizmo = new GizmoManager(scene);
-  gizmo.positionGizmoEnabled = true;
- 
   // camera.lowerBetaLimit = Math.PI/2;
   // camera.upperBetaLimit = 0;
-  camera.panningAxis = new Vector3(10, 0, 10)
+  camera.panningAxis = new Vector3(10, 50, 10)
+  camera.radius = 800;
   const zAixs = MeshBuilder.CreateLines("z", {
     points: [
       new Vector3(0, 0, 0),
@@ -42,40 +49,77 @@ export function createTianMap(engine: Engine, canvas: HTMLCanvasElement) {
   light.specular = Color3.Black();
   // var multimat = new MultiMaterial("multi", scene);
   // var zoom = 9;
-  function createTileMesh(imgUrl: { map: string }, mesh: Mesh) {
+  function createTileMesh(imgUrl: { map: string, city?: string }, mesh: Mesh) {
 
     const texture = new Texture(imgUrl.map, scene);
-
+    // const texture2 = new Texture(imgUrl.city, scene); 
     const mat = new StandardMaterial("mat", scene);
     mat.diffuseTexture = texture;
     mat.backFaceCulling = false;
-    // mat.emissiveTexture = texture;
+    // mat.emissiveTexture = texture2;
     // &x=843&y=388&z=10
     mesh.material = mat;
+    return mat;
   }
   const level = 3;
   const meshSize = 160;
   const everysize = meshSize / (2 ** (level - 3));
-  console.log("everysize",everysize)
+  console.log("everysize", everysize)
   const meshTiles: MeshTile[] = [];
+  const originPost = {
+    x: -640,
+    z: 320,
+    lat: -180,
+    lon: 90,
+  }
+  const bj = {
+    lat: 115,
+    lon: 39
+  }
+  const dlat = bj.lat - originPost.lat
+  const dlon = bj.lon - originPost.lon
+
+  const bj1 = MeshBuilder.CreateLines("z", {
+    points: [
+      new Vector3(-640, 50, 320).add(new Vector3(dlat, 0, dlon).scale(640 / 180)),
+      new Vector3(-640, 500, 320).add(new Vector3(dlat, 0, dlon).scale(640 / 180))
+    ], colors: [Color3.Random().toColor4(), Color3.Random().toColor4()]
+  })
+
+  // bj1.position = new Vector3(-640,50,320).add(new Vector3(dlat,0,dlon).scale(640/180));
+
+  MeshTile.Mesh = MeshBuilder.CreateGround("ground", { width: everysize, height: everysize }, scene);
+
+  MeshTile.Mesh.position.x += everysize / 2;
+  MeshTile.Mesh.position.z -= everysize / 2;
+  MeshTile.Mesh.bakeCurrentTransformIntoVertices();
+  MeshTile.Mesh.visibility = 0;
   for (let i = 0; i < (2 ** level); i++) {
+    // let a = setTimeout(() => { 
     for (let j = 0; j < (2 ** (level - 1)); j++) {
+      // let meshes = []
       // let img = getPic(i, j, level);
-      var ground = MeshBuilder.CreateGround("ground", { width: everysize, height: everysize }, scene);
-      ground.position.x += everysize / 2;
-      ground.position.z -= everysize / 2;
-      ground.bakeCurrentTransformIntoVertices();
-      ground.position.x = -4*meshSize + (i) * everysize;
-      ground.position.z = 2*meshSize - (j) * everysize;
-      const meshTile = new MeshTile(ground,i,j);
+      // var ground = MeshBuilder.CreateGround("ground", { width: everysize, height: everysize }, scene);
+      // ground.position.x += everysize / 2;
+      // meshes.push(ground);
+      // ground.position.z -= everysize / 2;
+      // ground.bakeCurrentTransformIntoVertices();
+      // ground.position.x = -4 * meshSize + (i) * everysize;
+      // ground.position.z = 2 * meshSize - (j) * everysize;
+      // console.log(ground.position.asArray());
+      const meshTile = new MeshTile([-4 * meshSize + (i) * everysize, 2 * meshSize - (j) * everysize], i, j, everysize / 2);
       meshTiles.push(meshTile);
       // createTileMesh(img,ground);
+      // Mesh.MergeMeshes(meshes,true,undefined,undefined,false,true);
     }
+    //   clearTimeout(a);
+    // }, i*100);
   }
-  console.log("length",meshTiles.length)
-  meshTiles.forEach((m)=>{
-    m?.loadLOD();
-  })
+  console.log("meshTiles",meshTiles)
+  // console.log("length",meshTiles.length)
+  // meshTiles.forEach((m)=>{
+  //   m?.loadLOD();
+  // })
   // scene.onBeforeRenderObservable.add(()=>{
   //   camera.position.y = 10;
   // })
@@ -92,14 +136,24 @@ export function createTianMap(engine: Engine, canvas: HTMLCanvasElement) {
   // =tiles&TILECOL=0
   // &TILEROW=0&TILEMATRIX=1&tk=68d166cfe304fa077ff035bed00edc37`
   const initResolution = 360 / 512;
+
   function getPic(col: number, row: number, level: number) {
     // const city  =`http://t0.tianditu.gov.cn/DataServer?x=${col}&y=${row}&l=${level}&T=cva_w&tk=68d166cfe304fa077ff035bed00edc37`
-    console.log(col, row)
+    // console.log(col, row)
+    // const a = "https://t0.tianditu.gov.cn/cia_c/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=cia&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&tk=tk"
+    // var imgURL2 ="http://t0.tianditu.gov.cn/cia_w/wmts?" +     "SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=cia&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles" +
+    //         `&TILEMATRIX=${level}&TILEROW=${col}&TILECOL=${row}` +
+    //         `&tk=68d166cfe304fa077ff035bed00edc37`;//
+
     return {
       // city:city,
-      map: `https://t2.tianditu.gov.cn/img_c/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=img&STYLE=default&TILEMATRIXSET=c&FORMAT=tiles&TILECOL=${col}&TILEROW=${row}&TILEMATRIX=${level}&tk=68d166cfe304fa077ff035bed00edc37`
+      // city :imgURL2,
+      map: `/map/${level}/${col}-${row}.png`
     }
   }
+  meshTiles.forEach((m) => {
+    m?.loadLOD();
+  })
   // `https://t2.tianditu.gov.cn/img_c/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=img&STYLE=default&TILEMATRIXSET=c&FORMAT=tiles&TILECOL=1&TILEROW=0&TILEMATRIX=1&tk=68d166cfe304fa077ff035bed00edc37`
 
   // const pic1 = ""
@@ -110,15 +164,25 @@ export function createTianMap(engine: Engine, canvas: HTMLCanvasElement) {
   // const maxRow = -1 * ((minY - 90) / (initResolution / 2 ^ (level - 1))) / 256;
   // console.log(minCol,minRow,maxCol,maxRow)
   console.log("tianMap", (2 ** (level)), (2 ** (level - 1)))
-  scene.onBeforeRenderObservable.add(() => {
-    // if (meshTiles[0]) {
-    //   console.log(meshTiles[0].getLodLevel());
-    //   meshTiles[0].loadLOD();
-    // }
-    // meshTiles.forEach((m)=>{
-    //   m?.loadLOD();
-    // })
+  camera.onViewMatrixChangedObservable.add(() => {
+    // if(camera.)
+    // Vector3
+    console.log("camera view");
+    meshTiles.forEach((m) => {
+      m?.loadLOD();
+    })
   })
+  // scene.onBeforeRenderObservable.add(() => {
+  //   // if (meshTiles[0]) {
+  //   //   console.log(meshTiles[0].getLodLevel());
+  //   //   meshTiles[0].loadLOD();
+  //   // }
+
+  //   meshTiles.forEach((m) => {
+  //     m?.loadLOD();
+  //   })
+
+  // })
 
 
   return scene;
