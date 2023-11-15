@@ -6,13 +6,14 @@ export class MeshTile {
   public boudingBoxCenter: number[];
   public lodMeshes: Mesh[];
   static Mesh: Mesh;
+  static meshSize:number
   private _lodLevel: number = 1;
   private scene: Scene;
   public parentI: number;
   public parentJ: number
-  constructor(position: number[], col: number, row: number, offset: number) {
+  constructor(position: number[], col: number, row: number, meshSize: number) {
     this.position = { x: position[0], z: position[1] };
-    this.boudingBoxCenter = [this.position.x + offset, 0, this.position.z - offset];
+    this.boudingBoxCenter = [this.position.x + meshSize/2, 0, this.position.z - meshSize/2];
     // console.log(mesh.name)
     // this.mesh = mesh;
     // this.mesh.renderingGroupId = 1;

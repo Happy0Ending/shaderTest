@@ -38,6 +38,7 @@ import { tileScene } from "./scene/tileScene";
 import Color from "element-plus/es/components/color-picker/src/color";
 import { create } from "lodash";
 import { createTianMap } from "./scene/tiaMap";
+import { createTianTileMap } from "./scene/tianTile/tianmap";
 export class SceneManager {
     public engine: Engine;
     public activeScene: Scene;
@@ -64,7 +65,7 @@ export class SceneManager {
 
         // this.boliScene = ppScene(this.engine, canvas);
         // this.mapScene = reflectScene(this.engine,canvas);
-        this.activeScene = createTianMap(this.engine, canvas);
+        this.activeScene = createTianTileMap(this.engine, canvas);
 
         this.engine.runRenderLoop(() => {
             this.activeScene.render();
