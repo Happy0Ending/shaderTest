@@ -8,37 +8,10 @@ import { IEdges, IGlInfo, IshaderMatInfo } from "./IProperty";
 import { IOptions } from "./Ioptions";
 import { IType, SceneType } from "./IType";
 import { gradientMatScene } from "./scene/grientScene";
-import { wireFrameScene } from "./scene/wireFrame";
-import { pbrScene } from "./scene/pbrScene";
-import { reflectScene } from "./scene/reflectScene";
-import { glassScene } from "./scene/glassScene";
-import { boliScene } from "./scene/glassBoliScene";
-import { textureScene } from "./scene/textureScene";
-import { mapScene } from "./scene/mapScene";
-import { Breadcrumb } from "ant-design-vue";
-import { lineScene } from "./scene/lineScene";
-import { LineSysManager } from "./lineSystem/lineSystemManager";
-import { ChartsManager } from "./scene/charts";
-import { prefabScene } from "./scene/prefabScene";
 import { CubeTexture } from "@babylonjs/core/Materials/Textures/cubeTexture";
-import { Plane } from "@babylonjs/core/Maths/math.plane";
-import { PBRBaseMaterial } from "@babylonjs/core/Materials/PBR/pbrBaseMaterial";
-import { createCharts } from "./echarts";
-import axios from "axios";
+
 import { createHtmlMesh } from "./CSS3dRender";
-import { createCharts2 } from "./charts/charts2";
-import { createCharts3 } from "./charts/charts3";
-import { createCharts4 } from "./charts/charts4";
-import { ppScene } from "./scene/perferance";
-// import { Map, View } from 'ol';
-// import TileLayer from 'ol/layer/Tile';
-// import * as olProj from "ol/proj";
-// import XYZ from 'ol/source/XYZ';
-import { tileScene } from "./scene/tileScene";
-import Color from "element-plus/es/components/color-picker/src/color";
-import { create } from "lodash";
-import { createTianMap } from "./scene/tiaMap";
-import { createTianTileMap } from "./scene/tianTile/tianmap";
+
 export class SceneManager {
     public engine: Engine;
     public activeScene: Scene;
@@ -65,7 +38,7 @@ export class SceneManager {
 
         // this.boliScene = ppScene(this.engine, canvas);
         // this.mapScene = reflectScene(this.engine,canvas);
-        this.activeScene = createTianTileMap(this.engine, canvas);
+        this.activeScene = gradientMatScene(this.engine, canvas);
 
         this.engine.runRenderLoop(() => {
             this.activeScene.render();

@@ -12,11 +12,17 @@ export class MeshTile {
   public parentJ: number;
   public _ci: number | undefined;
   public _cj: number | undefined;
-  public _originLevel: number
- 
+  public _originLevel: number;
+  public offset: number;
+  public size: number[];
+
+
   constructor(col: number, row: number, level: number) {
     const offset = (MeshTile.meshSize / (2 ** (level - 1)))
     const position = [-MeshTile.meshSize + (col) * offset, MeshTile.meshSize * 0.5 - (row) * offset]
+    this.offset = offset;
+    this.size = position.map((value) => value + offset);
+
     this.position = { x: position[0], z: position[1] };
     this.boudingBoxCenter = [this.position.x + MeshTile.meshSize / (2 ** level), 0, this.position.z - MeshTile.meshSize / (2 ** level)];
     // console.log(mesh.name)
@@ -29,6 +35,44 @@ export class MeshTile {
     this.parentI = col;
     this.parentJ = row;
     // console.log("prent i j", this.parentI, this.parentJ);
+  }
+
+  serializeTile() {
+    let mesh = this.lodMeshes[0];
+    let position = mesh.getAbsolutePosition().clone().asArray();
+    let sizeLocal = mesh.getBoundingInfo().boundingBox.maximumWorld.subtract(mesh.getBoundingInfo().boundingBox.minimumWorld).asArray();
+    let size = [position[0] + sizeLocal[0], position[1] + sizeLocal[1], position[2] + sizeLocal[2]];
+    let center = mesh.getBoundingInfo().boundingBox.centerWorld.clone().asArray();
+    return {
+      position,
+      size,
+      center
+    }
+  }
+
+  isTileIn(tile: MeshTile) {
+    let tileA = this.serializeTile();
+    let tileB = tile.serializeTile();
+    let flag = false;
+    if (tileB.center[0] > tileA.position[0]) {
+      if (tileB.center[0] < tileA.size[0]) {
+        if (tileB.center[2] > tileA.position[2]) {
+          if (tileB.center[2] < tileA.size[2]) {
+            flag = true;
+          }
+        }
+      }
+    }
+    // if (tile.boudingBoxCenter[0] > this.position.x) {
+    //   if (tile.boudingBoxCenter[0] < this.size[0]) {
+    //     if (tile.boudingBoxCenter[2] > this.position.z) {
+    //       if (tile.boudingBoxCenter[2] < this.size[1]) {
+    //         flag = true;
+    //       }
+    //     }
+    //   }
+    // }
+    return flag;
   }
 
   loadLOD = () => {
@@ -45,38 +89,38 @@ export class MeshTile {
     const originMesh = MeshTile.Mesh as Mesh;
     // MeshTile.InitMeshPovit(originMesh);
     const size = MeshTile.meshSize;
-   
-          let lodmesh = originMesh.clone("tileMesh");
-          // let offset = lodmesh.getBoundingInfo().boundingBox.extendSizeWorld.x;
-          lodmesh.visibility = 1;
-          lodmesh.isVisible = true
-          lodmesh.isPickable = true;
-          // lodmesh.position.x += offset
-          // lodmesh.position.z -=
-          lodmesh.position = Vector3.Zero();
-          lodmesh.scaling.x = 1 / (2 ** (this._originLevel-1));
-          lodmesh.scaling.z = 1 / (2 ** (this._originLevel-1));
-          const offset = MeshTile.meshSize / (2 ** (this._originLevel-1))
-          lodmesh.position.x = this.position.x + offset * (0);
-          lodmesh.position.z = this.position.z - offset * (0);
-          // lodmesh.position.y += 60;
-          this.lodMeshes.push(lodmesh)
-          let mat = new StandardMaterial("123", this.scene);
-          lodmesh.material = mat;
-          // let ci: number = this.parentI;
-          // let cj: number = this.parentJ;
-          // if (lodLevel) {
-        
-          this._ci = this.parentI; 
-          this._cj = this.parentJ
-          // }
-          let img = this.getPic(this._ci, this._cj, this._originLevel);
-          // console.log("ci,cj", ci, cj)
-          const texture = new Texture(img.map, this.scene);
-          mat.diffuseTexture = texture;
-          mat.backFaceCulling = false;
-          // console.log("这是第几个新建", i * 2 ** this._originLevel + j)
-        
+
+    let lodmesh = originMesh.clone("tileMesh");
+    // let offset = lodmesh.getBoundingInfo().boundingBox.extendSizeWorld.x;
+    lodmesh.visibility = 1;
+    lodmesh.isVisible = true
+    lodmesh.isPickable = true;
+    // lodmesh.position.x += offset
+    // lodmesh.position.z -=
+    lodmesh.position = Vector3.Zero();
+    lodmesh.scaling.x = 1 / (2 ** (this._originLevel - 1));
+    lodmesh.scaling.z = 1 / (2 ** (this._originLevel - 1));
+    const offset = MeshTile.meshSize / (2 ** (this._originLevel - 1))
+    lodmesh.position.x = this.position.x + offset * (0);
+    lodmesh.position.z = this.position.z - offset * (0);
+    // lodmesh.position.y += 60;
+    this.lodMeshes.push(lodmesh)
+    let mat = new StandardMaterial("123", this.scene);
+    lodmesh.material = mat;
+    // let ci: number = this.parentI;
+    // let cj: number = this.parentJ;
+    // if (lodLevel) {
+
+    this._ci = this.parentI;
+    this._cj = this.parentJ
+    // }
+    let img = this.getPic(this._ci, this._cj, this._originLevel);
+    // console.log("ci,cj", ci, cj)
+    const texture = new Texture(img.map, this.scene);
+    mat.diffuseTexture = texture;
+    mat.backFaceCulling = false;
+    // console.log("这是第几个新建", i * 2 ** this._originLevel + j)
+
   }
   getPic = (col: number, row: number, level: number) => {
     // const city  =`http://t0.tianditu.gov.cn/DataServer?x=${col}&y=${row}&l=${level}&T=cva_w&tk=68d166cfe304fa077ff035bed00edc37`

@@ -9,15 +9,12 @@ export function createTianTileMap(engine: Engine, canvas: HTMLCanvasElement) {
   // Create a rotating camera
   var camera = new ArcRotateCamera("Camera", 4.8, 0.5, 100, Vector3.Zero(), scene);
   camera.wheelDeltaPercentage = 0.1;
-  window.scene = scene;
+
   // Attach it to handle user inputs (keyboard, mouse, touch)
   camera.attachControl(canvas, false);
   camera.minZ = 0.001;
   camera.wheelPrecision = 0.1;
  
-
-
-
   const xAixs = MeshBuilder.CreateLines("x", {
     points: [
       new Vector3(0, 0, 0),
@@ -28,8 +25,8 @@ export function createTianTileMap(engine: Engine, canvas: HTMLCanvasElement) {
 
   const box = MeshBuilder.CreateSphere("123", { diameter: 10 }, scene);
   box.position = new Vector3(-640, 50, 320);
-  // let gizmo = new GizmoManager(scene);
-  // gizmo.positionGizmoEnabled = true;
+  let gizmo = new GizmoManager(scene);
+  gizmo.positionGizmoEnabled = true;
   // new Vector3(0, 0, 0)
   // camera.lowerBetaLimit = Math.PI/2;
   // camera.upperBetaLimit = 0;

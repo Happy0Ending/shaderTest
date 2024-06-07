@@ -46,12 +46,12 @@ export function daoScene(engine: Engine, canvas: HTMLCanvasElement) {
   // ];
   // const mesh = MeshBuilder.CreateBox("1", { size: 1 }, scene);
   // mesh.position.y += 10;
-  const path:Vector3[][] = []
+  const path: Vector3[][] = []
   for (let i = 1; i < 10; i++) {
     const p1 = new Vector3(1, 0, i - 1);
     const center = new Vector3(0, Math.sqrt(i), i - 1);
     const p2 = new Vector3(-1, 0, i - 1);
-    const besaier = Curve3.CreateQuadraticBezier(p1, center, p2,20);
+    const besaier = Curve3.CreateQuadraticBezier(p1, center, p2, 20);
     const bladePath = besaier.getPoints();
     const backPath = [
       p2,
@@ -74,15 +74,15 @@ export function daoScene(engine: Engine, canvas: HTMLCanvasElement) {
         ...bladePath,
         new Vector3(-1, -1, i - 1),
         new Vector3(1, -1, i - 1),
-         new Vector3(1, -1, i - 1),
+        new Vector3(1, -1, i - 1),
       ]
     )
   }
   for (let i = 10; i < 20; i++) {
     const p1 = new Vector3(1, 0, i - 1);
-    const center = new Vector3(0, Math.sqrt(20-i), i - 1);
+    const center = new Vector3(0, Math.sqrt(20 - i), i - 1);
     const p2 = new Vector3(-1, 0, i - 1);
-    const besaier = Curve3.CreateQuadraticBezier(p1, center, p2,20);
+    const besaier = Curve3.CreateQuadraticBezier(p1, center, p2, 20);
     const bladePath = besaier.getPoints();
     const backPath = [
       p2,
@@ -104,7 +104,7 @@ export function daoScene(engine: Engine, canvas: HTMLCanvasElement) {
         ...bladePath,
         new Vector3(-1, -1, i - 1),
         new Vector3(1, -1, i - 1),
-         new Vector3(1, -1, i - 1),
+        new Vector3(1, -1, i - 1),
       ]
     )
   }
@@ -112,7 +112,7 @@ export function daoScene(engine: Engine, canvas: HTMLCanvasElement) {
     const p1 = new Vector3(1, 0, i - 1);
     const center = new Vector3(0, Math.sqrt(i), i - 1);
     const p2 = new Vector3(-1, 0, i - 1);
-    const besaier = Curve3.CreateQuadraticBezier(p1, center, p2,20);
+    const besaier = Curve3.CreateQuadraticBezier(p1, center, p2, 20);
     const bladePath = besaier.getPoints();
     const backPath = [
       p2,
@@ -135,17 +135,17 @@ export function daoScene(engine: Engine, canvas: HTMLCanvasElement) {
         ...bladePath,
         new Vector3(-1, -1, i - 1),
         new Vector3(1, -1, i - 1),
-         new Vector3(1, -1, i - 1),
+        new Vector3(1, -1, i - 1),
       ]
     )
   }
-  let ribbon1 = MeshBuilder.CreateRibbon("ribbon", { pathArray: path,sideOrientation:2,closePath:true,updatable:true });
+  let ribbon1 = MeshBuilder.CreateRibbon("ribbon", { pathArray: path, sideOrientation: 2, closePath: true, updatable: true });
   setTimeout(() => {
     for (let i = 30; i < 40; i++) {
       const p1 = new Vector3(1, 0, i - 1);
-      const center = new Vector3(0, Math.sqrt(40-i), i - 1);
+      const center = new Vector3(0, Math.sqrt(40 - i), i - 1);
       const p2 = new Vector3(-1, 0, i - 1);
-      const besaier = Curve3.CreateQuadraticBezier(p1, center, p2,20);
+      const besaier = Curve3.CreateQuadraticBezier(p1, center, p2, 20);
       const bladePath = besaier.getPoints();
       const backPath = [
         p2,
@@ -167,17 +167,17 @@ export function daoScene(engine: Engine, canvas: HTMLCanvasElement) {
           ...bladePath,
           new Vector3(-1, -1, i - 1),
           new Vector3(1, -1, i - 1),
-           new Vector3(1, -1, i - 1),
+          new Vector3(1, -1, i - 1),
         ]
       )
       ribbon1?.dispose();
-      ribbon1 = MeshBuilder.CreateRibbon("ribbon", { pathArray: path,sideOrientation:2,closePath:true,updatable:true });
+      ribbon1 = MeshBuilder.CreateRibbon("ribbon", { pathArray: path, sideOrientation: 2, closePath: true, updatable: true });
     }
   }, 3000);
   // console.log("path:", path)
 
 
-  
+
 
 
   // scene.onPointerDown = (e,p)=>{
@@ -201,7 +201,14 @@ export function daoScene(engine: Engine, canvas: HTMLCanvasElement) {
   // })
   return scene;
 }
-
+window.scene1.getScene().scene.meshes.forEach((mesh:Mesh)=>
+{
+  let metadata = manager.getMetadata(mesh);
+  if(metadata.__glbUUID){
+    mesh.dispose(true)
+    mesh.visibility
+  }
+})
 function blackPostProgress(scene: Scene, camera: Camera) {
   Effect.ShadersStore["blackFragmentShader"] = `
     #ifdef GL_ES
